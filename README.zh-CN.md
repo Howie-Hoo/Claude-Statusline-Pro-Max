@@ -1,10 +1,12 @@
 # Claude-Statusline-Pro-Max
 
-[Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI 的响应式、高信息密度状态栏。
+> Claude Code CLI 的响应式状态栏 | A responsive, information-dense statusline for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
 
 <p align="center">
 <img width="800" alt="statusline 预览" src="docs/preview.svg" />
 </p>
+
+**[English Docs](README.md)**
 
 ## 显示内容
 
