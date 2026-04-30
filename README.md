@@ -70,6 +70,8 @@ Then add to `~/.claude/settings.json`:
 | [Compatibility](docs/COMPATIBILITY.md) | Platform notes, known issues, third-party providers |
 | [Changelog](docs/CHANGELOG.md) | Version history |
 
+**Chinese docs:** [README 中文版](README.zh-CN.md) | [架构](docs/zh/ARCHITECTURE.md) | [自定义](docs/zh/CUSTOMIZATION.md) | [兼容性](docs/zh/COMPATIBILITY.md) | [更新日志](docs/zh/CHANGELOG.md)
+
 ## Requirements
 
 - Claude Code CLI
