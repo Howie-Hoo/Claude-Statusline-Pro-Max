@@ -2,9 +2,9 @@
 
 All notable changes to Claude-Statusline-Pro-Max are documented here.
 
-## v2.0.0 — 2026-05-02
+## v1.1.0 — 2026-05-02
 
-Complete rewrite with TIER signal quality system, full responsive coverage, and CJK/emoji safety.
+Incremental improvements: TIER signal quality, responsive coverage gaps, CJK/emoji safety, and bug fixes.
 
 ### Architecture
 
