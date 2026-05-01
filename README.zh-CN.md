@@ -2,7 +2,7 @@
 
 [Claude Code](https://claude.ai/code) CLI 的响应式信息密集状态栏。纯 bash 脚本 — 除 `jq` 外零依赖。
 
-![预览](docs/preview.png)
+![预览](docs/preview.svg)
 
 ## 特性
 

@@ -2,7 +2,7 @@
 
 A responsive, information-dense statusline for [Claude Code](https://claude.ai/code) CLI. Pure bash script — zero dependencies beyond `jq`.
 
-![preview](docs/preview.png)
+![preview](docs/preview.svg)
 
 ## Features
 
@@ -96,7 +96,6 @@ All configuration is via `~/.claude/settings.json`:
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md) — Internal design and data flow
-- [Configuration](docs/CONFIGURATION.md) — Setup and settings reference
 - [Customization](docs/CUSTOMIZATION.md) — Theming and visual tweaks
 - [Compatibility](docs/COMPATIBILITY.md) — Platform and terminal support
 
