@@ -1,57 +1,85 @@
-# Claude-Statusline-Pro-Max
+# Claude Statusline Pro Max
 
-> Claude Code CLI 的响应式状态栏 | A responsive, information-dense statusline for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
+A responsive, information-dense statusline for [Claude Code](https://claude.ai/code) CLI. Pure bash script — zero dependencies beyond `jq`.
 
-<p align="center">
-<img width="800" alt="statusline preview" src="docs/preview.svg" />
-</p>
+![preview](docs/preview.png)
 
-**[中文文档](README.zh-CN.md)**
+## Features
 
-## What It Shows
-
-| Zone | Content | Example |
-|------|---------|---------|
-| Model | Name + thinking/effort/agent marks | `Opus 4.7 ✦ ⚡ 🤖` |
-| Path | Working directory (truncated) | `~/projects/app` |
-| Branch | Git branch with cache | `main` |
-| Context | Usage bar + percentage | `▓▓▓▓░░ 67%` |
-| Rate | Token rate (when available) | `42t/s` |
-| Vim | Vim mode indicator | `NORMAL` |
-| Duration | Session duration | `1h24m` |
-
-## Key Features
-
-- **12-level responsive layout** — gracefully adapts from wide terminals to narrow panes
-- **Exact CJK/emoji width** — `od`-based formula handles Chinese, Japanese, Korean, and emoji correctly
-- **Third-party provider support** — works with custom model endpoints (no `rate_limits` field? no problem)
-- **5s git branch cache** — avoids forking `git` on every refresh
-- **Compound duration** — `1h24m`, `2d3h`, not `84m` or `5040s`
-- **Zero dependencies** — pure bash, only `jq` for Claude Code schema parsing
+- **4-zone layout**: Model | Context | Workspace | Duration — adapts to any terminal width
+- **TIER signal quality**: Context display fidelity adapts to available data
+- **Family-preserving model names**: `opus-4-7`, `3-5-sonnet`, `haiku-4-5` — never lose identity
+- **CJK & emoji safe**: Display-width-aware truncation at every level, including emergency fallback
+- **Zero overflow guarantee**: 15 responsive levels + fallbacks, tested across 4–200 columns
+- **~44ms per refresh**: Zero-fork responsive loop with pre-computed zone lengths
 
 ## Quick Start
 
 ```bash
-# Clone
-git clone https://github.com/Howie-Hoo/Claude-Statusline-Pro-Max.git
-cd Claude-Statusline-Pro-Max
-
 # Install
-bash install.sh
-
-# Or install with auto-config
-bash install.sh --write-config
-
-# Restart Claude Code
-```
-
-### Manual Install
-
-```bash
 cp statusline-command.sh ~/.claude/statusline-command.sh
+
+# Add to ~/.claude/settings.json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh",
+    "refreshInterval": 5
+  }
+}
 ```
 
-Then add to `~/.claude/settings.json`:
+## The 4 Zones
+
+```
+Opus 4.7 ●🧠⬆ │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-app/src/components  main │ 1h24m 5h:35% 7d:12%
+└──── Model ────┘ └──────── Context ─────────────┘ └──── Workspace ──────┘ └──── Duration ────┘
+```
+
+| Zone | Content | Color Logic |
+|------|---------|-------------|
+| **Model** | Name + thinking/effort/agent marks | Opus=magenta, Sonnet=blue, Haiku=cyan |
+| **Context** | Progress bar + % + token counts | Green <70%, Yellow 70-86%, Red >86% |
+| **Workspace** | Project + relative path + git branch + vim mode | — |
+| **Duration** | Elapsed time + session tokens + rate limits | Rate: Green ≤59%, Yellow 60-84%, Red ≥85% |
+
+## Context TIER System
+
+The context zone adapts to signal quality — never shows misleading data:
+
+| TIER | Signal | Display |
+|------|--------|---------|
+| 1 | Full token breakdown available | Bar + % + input/output/cache tokens |
+| 2 | Percentage known, no token breakdown | Bar + % + context size |
+| 3 | Only context size known | "ctx 200.0k" |
+| 0 | No context data | "n/a" |
+
+## Responsive Behavior
+
+At narrow terminals, content truncates progressively:
+
+1. Rate limits drop first
+2. Then vim mode, session tokens, duration
+3. Then path shortens (full → mid → short)
+4. Then context simplifies (full → mid → short)
+5. Then model name shortens (full → mid → short/family)
+6. Emergency: model family keyword only
+
+## Marks
+
+| Mark | Meaning |
+|------|---------|
+| ● | Agent active |
+| 🧠 | Thinking enabled |
+| ⬆ | Effort: high |
+| ⬆⬆ | Effort: xhigh |
+| ⬆⬆⬆ | Effort: max |
+| 🔄 | Vim: INSERT |
+| 👁 | Vim: VISUAL |
+
+## Configuration
+
+All configuration is via `~/.claude/settings.json`:
 
 ```json
 {
@@ -63,28 +91,21 @@ Then add to `~/.claude/settings.json`:
 }
 ```
 
+`refreshInterval` controls how often the statusline updates (in seconds). Recommended: 3–5.
+
 ## Documentation
 
-| Document | Content |
-|----------|---------|
-| [Architecture](docs/ARCHITECTURE.md) | Zone layout, responsive levels, width calculation |
-| [Customization](docs/CUSTOMIZATION.md) | Colors, symbols, thresholds, adding new elements |
-| [Compatibility](docs/COMPATIBILITY.md) | Platform notes, known issues, third-party providers |
-| [Changelog](docs/CHANGELOG.md) | Version history |
-
-**Chinese docs:** [README 中文版](README.zh-CN.md) | [架构](docs/zh/ARCHITECTURE.md) | [自定义](docs/zh/CUSTOMIZATION.md) | [兼容性](docs/zh/COMPATIBILITY.md) | [更新日志](docs/zh/CHANGELOG.md)
+- [Architecture](docs/ARCHITECTURE.md) — Internal design and data flow
+- [Configuration](docs/CONFIGURATION.md) — Setup and settings reference
+- [Customization](docs/CUSTOMIZATION.md) — Theming and visual tweaks
+- [Compatibility](docs/COMPATIBILITY.md) — Platform and terminal support
 
 ## Requirements
 
-- Claude Code CLI
-- bash 3.2+ (macOS default)
-- `jq` (for parsing Claude Code schema)
-- Git (optional, for branch display)
-
-## Performance
-
-~3-4ms per refresh on Apple Silicon. No perceptible lag at 5s interval.
+- Bash 3.2+ (macOS default)
+- `jq` (JSON parsing)
+- Standard Unix tools (`git`, `stat`, `sed`, `grep`)
 
 ## License
 
-[MIT](LICENSE)
+MIT

@@ -1,57 +1,85 @@
-# Claude-Statusline-Pro-Max
+# Claude Statusline Pro Max
 
-> Claude Code CLI 的响应式状态栏 | A responsive, information-dense statusline for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
+[Claude Code](https://claude.ai/code) CLI 的响应式信息密集状态栏。纯 bash 脚本 — 除 `jq` 外零依赖。
 
-<p align="center">
-<img width="800" alt="statusline 预览" src="docs/preview.svg" />
-</p>
+![预览](docs/preview.png)
 
-**[English Docs](README.md)**
+## 特性
 
-## 显示内容
-
-| 区域 | 内容 | 示例 |
-|------|------|------|
-| 模型 | 名称 + 思考/努力/代理标记 | `Opus 4.7 ✦ ⚡ 🤖` |
-| 路径 | 工作目录（截断） | `~/projects/app` |
-| 分支 | Git 分支（带缓存） | `main` |
-| 上下文 | 用量进度条 + 百分比 | `▓▓▓▓░░ 67%` |
-| 速率 | Token 速率（可用时） | `42t/s` |
-| Vim | Vim 模式指示器 | `NORMAL` |
-| 时长 | 会话时长 | `1h24m` |
-
-## 核心特性
-
-- **12 级响应式布局** — 从宽终端到窄面板优雅适配
-- **精确 CJK/emoji 宽度** — 基于 `od` 的公式正确处理中文、日文、韩文和 emoji
-- **第三方 Provider 支持** — 兼容自定义模型端点（没有 `rate_limits` 字段也不报错）
-- **5 秒 Git 分支缓存** — 避免每次刷新都 fork `git` 进程
-- **复合时长格式** — `1h24m`、`2d3h`，不是 `84m` 或 `5040s`
-- **零外部依赖** — 纯 bash，仅需 `jq` 解析 Claude Code schema
+- **4 区域布局**：Model | Context | Workspace | Duration — 自适应任意终端宽度
+- **TIER 信号质量**：上下文显示精度随可用数据自动调整
+- **家族保留模型名**：`opus-4-7`、`3-5-sonnet`、`haiku-4-5` — 永不丢失身份
+- **CJK & emoji 安全**：每一级截断都基于显示宽度，包括紧急回退
+- **零溢出保证**：15 级响应式 + 回退，4–200 列全测试
+- **~44ms/次刷新**：零 fork 响应式循环 + 预(计算区域长度)
 
 ## 快速开始
 
 ```bash
-# 克隆
-git clone https://github.com/Howie-Hoo/Claude-Statusline-Pro-Max.git
-cd Claude-Statusline-Pro-Max
-
 # 安装
-bash install.sh
+!cp statusline-command.sh ~/.claude/statusline-command.sh
 
-# 或安装并自动写入配置
-bash install.sh --write-config
-
-# 重启 Claude Code
+# 在 ~/.claude/settings.json 中添加
+{
+ <parameter name="statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh",
+    "refreshInterval": 5
+  }
+}
 ```
 
-### 手动安装
+## 4 个区域
 
-```bash
-cp statusline-command.sh ~/.claude/statusline-command.sh
+```
+Opus 4.7 ●🧠⬆ │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-app/src/components  main │ 1h24m 5h:35% 7d:12%
+└──── 模型 ────┘ └──────── 上下文 ─────────────┘ └──── 工作区 ──────┘ └──── 时长 ────┘
 ```
 
-然后在 `~/.claude/settings.json` 中添加：
+| 区域 | 内容 | 颜色逻辑 |
+|------|------|----------|
+| **模型** | 名称 + 思考/努力/代理标记 | Opus=品红, Sonnet=蓝, Haiku=青 |
+| **上下文** | 进度条 + % + token 数量 | 绿色 <70%, 黄色 70-86%, 红色 >86% |
+| **工作区** | 项目 + 相对路径 + git 分支 + vim 模式 | — |
+| **时长** | 经过时间 + 会话 token + 速率限制 | 速率：绿色 ≤59%, 黄色 60-84%, 红色 ≥85% |
+
+## 上下文 TIER 系统
+
+上下文区域根据信号质量自适应 — 永不显示误导性数据：
+
+| TIER | 信号 | 显示 |
+|------|------|------|
+| 1 | 完整 token 分解可用 | 条 + % + input/output/cache token |
+| 2 | 百分比已知，无 token 分解 | 条 + % + 上下文大小 |
+| 3 | 仅上下文大小已知 | "ctx 200.0k" |
+| 0 | 无上下文数据 | "n/a" |
+
+## 响应式行为
+
+窄终端下内容渐进截断：
+
+1. 速率限制最先移除
+2. 然后 vim 模式、会话 token、时长
+3. 路径缩短（完整 → 中等 → 短）
+4. 上下文简化（完整 → 中等 → 短）
+5. 模型名缩短（完整 → 中等 → 短/家族名）
+6. 紧急：仅显示模型家族关键词
+
+## 标记
+
+| 标记 | 含义 |
+|------|------|
+| ● | 代理活跃 |
+| 🧠 | 思考已启用 |
+| ⬆ | 努力：high |
+| ⬆⬆ | 努力：xhigh |
+| ⬆⬆⬆ | 努力：max |
+| 🔄 | Vim：INSERT |
+| 👁 | Vim：VISUAL |
+
+## 配置
+
+所有配置通过 `~/.claude/settings.json`：
 
 ```json
 {
@@ -63,30 +91,20 @@ cp statusline-command.sh ~/.claude/statusline-command.sh
 }
 ```
 
+`refreshInterval` 控制状态栏更新频率（秒）。推荐：3–5。
+
 ## 文档
 
-| 文档 | 内容 |
-|------|------|
-| [架构](docs/ARCHITECTURE.md) | 区域布局、响应级别、宽度算法 |
-| [自定义](docs/CUSTOMIZATION.md) | 颜色、符号、阈值、添加新元素 |
-| [兼容性](docs/COMPATIBILITY.md) | 平台说明、已知问题、第三方 Provider |
-| [更新日志](docs/CHANGELOG.md) | 版本历史 |
-| [架构（中文）](docs/zh/ARCHITECTURE.md) | 架构中文版 |
-| [自定义（中文）](docs/zh/CUSTOMIZATION.md) | 自定义中文版 |
-| [兼容性（中文）](docs/zh/COMPATIBILITY.md) | 兼容性中文版 |
-| [更新日志（中文）](docs/zh/CHANGELOG.md) | 更新日志中文版 |
+- [架构](docs/zh/ARCHITECTURE.md) — 内部设计和数据流
+- [自定义](docs/zh/CUSTOMIZATION.md) — 主题和视觉调整
+- [兼容性](docs/zh/COMPATIBILITY.md) — 平台和终端支持
 
 ## 依赖
 
-- Claude Code CLI
-- bash 3.2+（macOS 默认）
-- `jq`（解析 Claude Code schema）
-- Git（可选，用于分支显示）
-
-## 性能
-
-Apple Silicon 上每次刷新约 3-4ms。5 秒间隔下无感知延迟。
+- Bash 3.2+（macOS 默认）
+- `jq`（JSON 解析）
+- 标准 Unix 工具（`git`、`stat`、`sed`、`grep`）
 
 ## 许可证
 
-[MIT](LICENSE)
+MIT
