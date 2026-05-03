@@ -32,7 +32,7 @@ cp statusline-command.sh ~/.claude/statusline-command.sh
 ## The 4 Zones
 
 ```
-Opus 4.7 ● h │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-app/src/components  main │ 1h24m 5h:35% 7d:12%
+Opus 4.7 ● h │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-app/src/components  main │ 1h24m 130.0k 5h:35% 7d:12%
 └──── Model ────┘ └──────── Context ─────────────┘ └──── Workspace ──────┘ └──── Duration ────┘
 ```
 
