@@ -34,7 +34,7 @@ cp statusline-command.sh ~/.claude/statusline-command.sh
 ## The 4 Zones
 
 ```
-Opus 4.7 ● h │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-app/src/components  main │ 1h24m 130.0k 5h:35% 7d:12%
+Opus 4.7 ● h │ ▓▓▓▓▓▓░░░░ 67% 130.0k/200.0k │ my-app/src/components main │ 1h24m 130.0k 5h:35% 7d:12%
 └──── Model ────┘ └──────── Context ─────────────┘ └──── Workspace ──────┘ └──── Duration ────┘
 ```
 
@@ -51,7 +51,7 @@ The context zone adapts to signal quality — never shows misleading data:
 
 | TIER | Signal | Display |
 |------|--------|---------|
-| 1 | Full token breakdown available | Bar + % + input/output/cache tokens |
+| 1 | Full token breakdown available | Bar + % + used/total tokens |
 | 2 | Percentage known, no token breakdown | Bar + % + context size |
 | 3 | Only context size known | "ctx 200.0k" |
 | 0 | No context data | "n/a" |
@@ -72,13 +72,14 @@ At narrow terminals, content truncates progressively:
 | Mark | Meaning |
 |------|---------|
 | ● | Thinking enabled |
-| ● | Agent active |
+| @name | Agent active (first 8 chars) |
 | h | Effort: high |
 | x | Effort: xhigh |
 | M | Effort: max |
 | [N] | Vim: NORMAL |
 | [I] | Vim: INSERT |
 | [V] | Vim: VISUAL |
+| [V-L] | Vim: VISUAL LINE |
 
 ## Configuration
 

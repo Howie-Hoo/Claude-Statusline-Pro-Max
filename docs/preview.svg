@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="280" viewBox="0 0 900 280">
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="280" viewBox="0 0 920 280">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#1a1b26"/>
@@ -7,63 +7,97 @@
   </defs>
 
   <!-- Background -->
-  <rect width="900" height="280" rx="12" fill="url(#bg)"/>
+  <rect width="920" height="280" rx="12" fill="url(#bg)"/>
 
   <!-- Title -->
-  <text x="450" y="36" text-anchor="middle" fill="#7aa2f7" font-family="monospace" font-size="16" font-weight="bold">Claude Statusline Pro Max</text>
+  <text x="460" y="36" text-anchor="middle" fill="#7aa2f7" font-family="monospace" font-size="16" font-weight="bold">Claude Statusline Pro Max</text>
 
   <!-- Wide terminal (200 cols) -->
+  <!-- Actual: Opus 4.7 ● h │ ▓▓▓▓▓▓░░░░ 67% 130.0k/200.0k │ my-app/src/components main │ 1h24m 130.0k 5h:35% 7d:12% -->
   <text x="30" y="68" fill="#565f89" font-family="monospace" font-size="11">Terminal 200 cols</text>
-  <rect x="30" y="76" width="840" height="32" rx="6" fill="#1f2335"/>
-  <text x="42" y="97" fill="#bb9af7" font-family="monospace" font-size="13" font-weight="bold">Opus 4.7</text>
-  <text x="118" y="97" fill="#9ece6a" font-family="monospace" font-size="13"> ● </text>
-  <text x="138" y="97" fill="#9ece6a" font-family="monospace" font-size="13">h</text>
-  <text x="148" y="97" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
-  <text x="168" y="97" fill="#9ece6a" font-family="monospace" font-size="13">▓▓▓▓▓▓▓░░░</text>
-  <text x="262" y="97" fill="#c0caf5" font-family="monospace" font-size="13">67.3%</text>
-  <text x="302" y="97" fill="#565f89" font-family="monospace" font-size="13">80.0k/50.0k</text>
-  <text x="402" y="97" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
-  <text x="422" y="97" fill="#7dcfff" font-family="monospace" font-size="13">my-app/src/components</text>
-  <text x="598" y="97" fill="#e0af68" font-family="monospace" font-size="13"> main</text>
-  <text x="638" y="97" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
-  <text x="658" y="97" fill="#565f89" font-family="monospace" font-size="13">1h24m</text>
-  <text x="702" y="97" fill="#565f89" font-family="monospace" font-size="13"> 130.0k</text>
-  <text x="762" y="97" fill="#9ece6a" font-family="monospace" font-size="13">5h:35%</text>
-  <text x="814" y="97" fill="#565f89" font-family="monospace" font-size="13">7d:12%</text>
+  <rect x="30" y="76" width="860" height="32" rx="6" fill="#1f2335"/>
+  <text y="97" font-family="monospace" font-size="13">
+    <tspan x="42" fill="#bb9af7" font-weight="bold">Opus 4.7</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#9ece6a">●</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#9ece6a">h</tspan>
+    <tspan fill="#565f89"> │ </tspan>
+    <tspan fill="#9ece6a">▓▓▓▓▓▓░░░░</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#9ece6a">67%</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#565f89">130.0k/200.0k</tspan>
+    <tspan fill="#565f89"> │ </tspan>
+    <tspan fill="#7dcfff">my-app/src/components</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#e0af68">main</tspan>
+    <tspan fill="#565f89"> │ </tspan>
+    <tspan fill="#565f89">1h24m</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#565f89">130.0k</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#9ece6a">5h:35%</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#565f89">7d:12%</tspan>
+  </text>
 
-  <!-- Medium terminal (120 cols) -->
-  <text x="30" y="138" fill="#565f89" font-family="monospace" font-size="11">Terminal 120 cols</text>
-  <rect x="30" y="146" width="540" height="32" rx="6" fill="#1f2335"/>
-  <text x="42" y="167" fill="#bb9af7" font-family="monospace" font-size="13" font-weight="bold">Opus 4.7</text>
-  <text x="118" y="167" fill="#9ece6a" font-family="monospace" font-size="13"> ● </text>
-  <text x="138" y="167" fill="#9ece6a" font-family="monospace" font-size="13">h</text>
-  <text x="148" y="167" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
-  <text x="168" y="167" fill="#9ece6a" font-family="monospace" font-size="13">▓▓▓▓▓▓▓░░░</text>
-  <text x="262" y="167" fill="#c0caf5" font-family="monospace" font-size="13">67.3%</text>
-  <text x="302" y="167" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
-  <text x="322" y="167" fill="#7dcfff" font-family="monospace" font-size="13">my-app/src/components</text>
-  <text x="518" y="167" fill="#e0af68" font-family="monospace" font-size="13"> main</text>
-  <text x="558" y="167" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
-  <text x="578" y="167" fill="#565f89" font-family="monospace" font-size="13">1h24m</text>
-  <text x="622" y="167" fill="#9ece6a" font-family="monospace" font-size="13">5h:35%</text>
-  <text x="674" y="167" fill="#565f89" font-family="monospace" font-size="13">7d:12%</text>
+  <!-- Medium terminal (100 cols) -->
+  <!-- Actual: Opus 4.7 ● h │ ▓▓▓▓▓▓░░░░ 67% 130.0k/200.0k │ my-app/…/components main │ 1h24m 130.0k 5h:35% 7d:12% -->
+  <text x="30" y="138" fill="#565f89" font-family="monospace" font-size="11">Terminal 100 cols</text>
+  <rect x="30" y="146" width="460" height="32" rx="6" fill="#1f2335"/>
+  <text y="167" font-family="monospace" font-size="13">
+    <tspan x="42" fill="#bb9af7" font-weight="bold">Opus 4.7</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#9ece6a">●</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#9ece6a">h</tspan>
+    <tspan fill="#565f89"> │ </tspan>
+    <tspan fill="#9ece6a">▓▓▓▓▓▓░░░░</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#9ece6a">67%</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#565f89">130.0k/200.0k</tspan>
+    <tspan fill="#565f89"> │ </tspan>
+    <tspan fill="#7dcfff">my-app/…/components</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#e0af68">main</tspan>
+    <tspan fill="#565f89"> │ </tspan>
+    <tspan fill="#565f89">1h24m</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#565f89">130.0k</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#9ece6a">5h:35%</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#565f89">7d:12%</tspan>
+  </text>
 
   <!-- Narrow terminal (80 cols) -->
+  <!-- Actual: Opus 4.7 ● h │ 67% │ my-app/…/components main │ 1h24m 130.0k 5h:35% 7d:12% -->
   <text x="30" y="208" fill="#565f89" font-family="monospace" font-size="11">Terminal 80 cols</text>
-  <rect x="30" y="216" width="360" height="32" rx="6" fill="#1f2335"/>
-  <text x="42" y="237" fill="#bb9af7" font-family="monospace" font-size="13" font-weight="bold">Opus 4.7</text>
-  <text x="118" y="237" fill="#9ece6a" font-family="monospace" font-size="13"> ● </text>
-  <text x="138" y="237" fill="#9ece6a" font-family="monospace" font-size="13">h</text>
-  <text x="148" y="237" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
-  <text x="168" y="237" fill="#c0caf5" font-family="monospace" font-size="13">67%</text>
-  <text x="198" y="237" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
-  <text x="218" y="237" fill="#7dcfff" font-family="monospace" font-size="13">my-app/…/components</text>
-  <text x="358" y="237" fill="#e0af68" font-family="monospace" font-size="13"> main</text>
-  <text x="398" y="237" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
-  <text x="418" y="237" fill="#565f89" font-family="monospace" font-size="13">1h24m</text>
-  <text x="458" y="237" fill="#9ece6a" font-family="monospace" font-size="13">5h:35%</text>
-  <text x="510" y="237" fill="#565f89" font-family="monospace" font-size="13">7d:12%</text>
+  <rect x="30" y="216" width="380" height="32" rx="6" fill="#1f2335"/>
+  <text y="237" font-family="monospace" font-size="13">
+    <tspan x="42" fill="#bb9af7" font-weight="bold">Opus 4.7</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#9ece6a">●</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#9ece6a">h</tspan>
+    <tspan fill="#565f89"> │ </tspan>
+    <tspan fill="#9ece6a">67%</tspan>
+    <tspan fill="#565f89"> │ </tspan>
+    <tspan fill="#7dcfff">my-app/…/components</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#e0af68">main</tspan>
+    <tspan fill="#565f89"> │ </tspan>
+    <tspan fill="#565f89">1h24m</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#565f89">130.0k</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#9ece6a">5h:35%</tspan>
+    <tspan fill="#565f89"> </tspan>
+    <tspan fill="#565f89">7d:12%</tspan>
+  </text>
 
   <!-- Footer -->
-  <text x="450" y="272" text-anchor="middle" fill="#414868" font-family="monospace" font-size="10">Responsive layout adapts from 200+ to 4 columns — zero overflow guarantee</text>
+  <text x="460" y="272" text-anchor="middle" fill="#414868" font-family="monospace" font-size="10">Responsive layout adapts from 200+ to 4 columns — zero overflow guarantee</text>
 </svg>

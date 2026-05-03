@@ -9,7 +9,7 @@ Claude-Statusline-Pro-Max 的所有重要变更均记录于此。
 ### 架构
 
 - **TIER 信号质量系统**：上下文显示根据可用信号强度自适应
-  - TIER 1：完整保真 — 进度条 + 百分比 + token 数量
+  - TIER 1：完整保真 — 进度条 + 百分比 + 已用/总量 token
   - TIER 2：条 + 百分比 + 大小（无 token 分解）
   - TIER 3：仅大小（"ctx 200.0k"）
   - TIER 0：无数据（"n/a"）

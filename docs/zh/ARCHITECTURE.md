@@ -21,7 +21,7 @@ stdin (JSON) → jq 解析 → 区域计算 → 响应式组装 → stdout
 - 模型名称带颜色编码（Opus=品红, Sonnet=蓝, Haiku=青, 其他=绿）
 - 思考指示器：扩展思考启用时显示 `●`
 - 努力等级：`h`/`x`/`M` 后缀（high/xhigh/max）
-- 代理指示器：代理活跃时显示 `●` 前缀
+- 代理指示器：`@name` 前缀，代理活跃时显示（前 8 字符）
 - **家族保留截断**：提取家族关键词 + 版本链，跳过 "claude" 前缀和日期戳
   - `claude-opus-4-7` → 中等: `opus-4-7`, 短名: `opus`
   - `claude-3-5-sonnet-20241022` → 中等: `3-5-sonnet`, 短名: `sonnet`
@@ -33,7 +33,7 @@ stdin (JSON) → jq 解析 → 区域计算 → 响应式组装 → stdout
 
 | TIER | 信号 | 显示 |
 |------|------|------|
-| 1 | 完整 token 分解可用（`current_usage` 非零） | 条 + % + input/output/cache token |
+| 1 | 完整 token 分解可用（`current_usage` 非零） | 条 + % + 已用/总量 token |
 | 2 | 百分比已知，无 token 分解 | 条 + % + 上下文大小 |
 | 3 | 仅上下文大小已知 | "ctx 200.0k" |
 | 0 | 无上下文数据 | "n/a" |
@@ -54,7 +54,7 @@ stdin (JSON) → jq 解析 → 区域计算 → 响应式组装 → stdout
 - `path_mid` 截断：项目名上限 20 字符（与根目录情况一致）
 - Git 分支：优先用 schema 字段（`wt_branch`、`git_worktree`、`worktree_name`），回退到 `git` 命令 + 5 秒缓存
 - 路径为空时分支加 `│` 前缀（视觉区分）
-- Vim 模式指示器：`[N]` NORMAL，`[I]` INSERT，`[V]` VISUAL
+- Vim 模式指示器：`[N]` NORMAL，`[I]` INSERT，`[V]` VISUAL，`[V-L]` VISUAL LINE
 
 ### 区域 4 — 时长
 

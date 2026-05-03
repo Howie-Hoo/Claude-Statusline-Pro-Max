@@ -19,11 +19,11 @@
 
 ```bash
 # 安装
-!cp statusline-command.sh ~/.claude/statusline-command.sh
+cp statusline-command.sh ~/.claude/statusline-command.sh
 
 # 在 ~/.claude/settings.json 中添加
 {
- <parameter name="statusLine": {
+  "statusLine": {
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh",
     "refreshInterval": 5
@@ -34,7 +34,7 @@
 ## 4 个区域
 
 ```
-Opus 4.7 ● h │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-app/src/components  main │ 1h24m 130.0k 5h:35% 7d:12%
+Opus 4.7 ● h │ ▓▓▓▓▓▓░░░░ 67% 130.0k/200.0k │ my-app/src/components main │ 1h24m 130.0k 5h:35% 7d:12%
 └──── 模型 ────┘ └──────── 上下文 ─────────────┘ └──── 工作区 ──────┘ └──── 时长 ────┘
 ```
 
@@ -51,7 +51,7 @@ Opus 4.7 ● h │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-app/s
 
 | TIER | 信号 | 显示 |
 |------|------|------|
-| 1 | 完整 token 分解可用 | 条 + % + input/output/cache token |
+| 1 | 完整 token 分解可用 | 条 + % + 已用/总量 token |
 | 2 | 百分比已知，无 token 分解 | 条 + % + 上下文大小 |
 | 3 | 仅上下文大小已知 | "ctx 200.0k" |
 | 0 | 无上下文数据 | "n/a" |
@@ -72,13 +72,14 @@ Opus 4.7 ● h │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-app/s
 | 标记 | 含义 |
 |------|------|
 | ● | 思考已启用 |
-| ● | 代理活跃 |
+| @name | 代理活跃（前 8 字符） |
 | h | 努力：high |
 | x | 努力：xhigh |
 | M | 努力：max |
 | [N] | Vim：NORMAL |
 | [I] | Vim：INSERT |
 | [V] | Vim：VISUAL |
+| [V-L] | Vim：VISUAL LINE |
 
 ## 配置
 

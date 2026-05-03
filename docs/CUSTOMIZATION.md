@@ -66,7 +66,7 @@ fi
 | Mark | Meaning | Variable |
 |------|---------|----------|
 | `●` | Thinking enabled | `think_mark` |
-| `●` | Agent active | `agent_mark` |
+| `@name` | Agent active (first 8 chars) | `agent_mark` |
 | `h` | Effort: high | `effort_mark` |
 | `x` | Effort: xhigh | `effort_mark` |
 | `M` | Effort: max | `effort_mark` |

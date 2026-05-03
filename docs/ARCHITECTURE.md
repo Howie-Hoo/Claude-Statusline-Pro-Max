@@ -21,7 +21,7 @@ Zone 1: Model    │  Zone 2: Context  │  Zone 3: Workspace  │  Zone 4: Dura
 - Model name with color coding (Opus=magenta, Sonnet=blue, Haiku=cyan, other=green)
 - Thinking indicator: `●` when extended thinking is enabled
 - Effort level: `h`/`x`/`M` suffix for high/xhigh/max
-- Agent indicator: `●` prefix when agent is active
+- Agent indicator: `@name` prefix when agent is active (first 8 chars)
 - **Family-preserving truncation**: extracts family keyword + version chain, skips "claude" prefix and date stamps
   - `claude-opus-4-7` → mid: `opus-4-7`, short: `opus`
   - `claude-3-5-sonnet-20241022` → mid: `3-5-sonnet`, short: `sonnet`
@@ -33,7 +33,7 @@ Zone 1: Model    │  Zone 2: Context  │  Zone 3: Workspace  │  Zone 4: Dura
 
 | TIER | Signal | Display |
 |------|--------|---------|
-| 1 | Full token breakdown available (`current_usage` non-zero) | Bar + % + input/output/cache tokens |
+| 1 | Full token breakdown available (`current_usage` non-zero) | Bar + % + used/total tokens |
 | 2 | Percentage known, no token breakdown | Bar + % + context size |
 | 3 | Only context size known | "ctx 200.0k" |
 | 0 | No context data | "n/a" |
@@ -54,7 +54,7 @@ Rationale: `total_input_tokens`/`total_output_tokens` are cumulative across the 
 - `path_mid` truncation: project name capped at 20 chars (consistent with root case)
 - Git branch: schema fields first (`wt_branch`, `git_worktree`, `worktree_name`), then `git` command with 5s cache
 - Branch gets `│` prefix when path is empty (visual distinction from context zone)
-- Vim mode indicator: `[N]` NORMAL, `[I]` INSERT, `[V]` VISUAL
+- Vim mode indicator: `[N]` NORMAL, `[I]` INSERT, `[V]` VISUAL, `[V-L]` VISUAL LINE
 
 ### Zone 4 — Duration
 

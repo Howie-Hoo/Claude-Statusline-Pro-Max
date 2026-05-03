@@ -9,7 +9,7 @@ Incremental improvements: TIER signal quality, responsive coverage gaps, CJK/emo
 ### Architecture
 
 - **TIER signal quality system**: Context display adapts to available signal strength
-  - TIER 1: full fidelity — progress bar + percentage + token counts
+  - TIER 1: full fidelity — progress bar + percentage + used/total tokens
   - TIER 2: bar + percentage + size (no token breakdown)
   - TIER 3: size only ("ctx 200.0k")
   - TIER 0: no data ("n/a")

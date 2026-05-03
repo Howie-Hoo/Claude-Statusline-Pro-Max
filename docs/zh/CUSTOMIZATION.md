@@ -66,7 +66,7 @@ fi
 | 标记 | 含义 | 变量 |
 |------|------|------|
 | `●` | 思考已启用 | `think_mark` |
-| `●` | 代理活跃 | `agent_mark` |
+| `@name` | 代理活跃（前 8 字符） | `agent_mark` |
 | `h` | 努力：high | `effort_mark` |
 | `x` | 努力：xhigh | `effort_mark` |
 | `M` | 努力：max | `effort_mark` |
