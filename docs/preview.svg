@@ -16,48 +16,53 @@
   <text x="30" y="68" fill="#565f89" font-family="monospace" font-size="11">Terminal 200 cols</text>
   <rect x="30" y="76" width="840" height="32" rx="6" fill="#1f2335"/>
   <text x="42" y="97" fill="#bb9af7" font-family="monospace" font-size="13" font-weight="bold">Opus 4.7</text>
-  <text x="118" y="97" fill="#9ece6a" font-family="monospace" font-size="13">● h</text>
-  <text x="140" y="97" fill="#565f89" font-family="monospace" font-size="13">│</text>
-  <text x="152" y="97" fill="#9ece6a" font-family="monospace" font-size="13">▓▓▓▓▓▓▓░░░</text>
-  <text x="246" y="97" fill="#c0caf5" font-family="monospace" font-size="13">67.3%</text>
-  <text x="286" y="97" fill="#565f89" font-family="monospace" font-size="13">80.0k/50.0k</text>
-  <text x="386" y="97" fill="#565f89" font-family="monospace" font-size="13">│</text>
-  <text x="398" y="97" fill="#7dcfff" font-family="monospace" font-size="13">my-app/src/components</text>
-  <text x="574" y="97" fill="#e0af68" font-family="monospace" font-size="13">main</text>
-  <text x="614" y="97" fill="#565f89" font-family="monospace" font-size="13">│</text>
-  <text x="626" y="97" fill="#565f89" font-family="monospace" font-size="13">1h24m</text>
-  <text x="670" y="97" fill="#565f89" font-family="monospace" font-size="13">130.0k</text>
-  <text x="720" y="97" fill="#9ece6a" font-family="monospace" font-size="13">5h:35%</text>
-  <text x="772" y="97" fill="#565f89" font-family="monospace" font-size="13">7d:12%</text>
+  <text x="118" y="97" fill="#9ece6a" font-family="monospace" font-size="13"> ● </text>
+  <text x="138" y="97" fill="#9ece6a" font-family="monospace" font-size="13">h</text>
+  <text x="148" y="97" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
+  <text x="168" y="97" fill="#9ece6a" font-family="monospace" font-size="13">▓▓▓▓▓▓▓░░░</text>
+  <text x="262" y="97" fill="#c0caf5" font-family="monospace" font-size="13">67.3%</text>
+  <text x="302" y="97" fill="#565f89" font-family="monospace" font-size="13">80.0k/50.0k</text>
+  <text x="402" y="97" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
+  <text x="422" y="97" fill="#7dcfff" font-family="monospace" font-size="13">my-app/src/components</text>
+  <text x="598" y="97" fill="#e0af68" font-family="monospace" font-size="13"> main</text>
+  <text x="638" y="97" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
+  <text x="658" y="97" fill="#565f89" font-family="monospace" font-size="13">1h24m</text>
+  <text x="702" y="97" fill="#565f89" font-family="monospace" font-size="13"> 130.0k</text>
+  <text x="762" y="97" fill="#9ece6a" font-family="monospace" font-size="13">5h:35%</text>
+  <text x="814" y="97" fill="#565f89" font-family="monospace" font-size="13">7d:12%</text>
 
   <!-- Medium terminal (120 cols) -->
   <text x="30" y="138" fill="#565f89" font-family="monospace" font-size="11">Terminal 120 cols</text>
   <rect x="30" y="146" width="540" height="32" rx="6" fill="#1f2335"/>
   <text x="42" y="167" fill="#bb9af7" font-family="monospace" font-size="13" font-weight="bold">Opus 4.7</text>
-  <text x="118" y="167" fill="#9ece6a" font-family="monospace" font-size="13">● h</text>
-  <text x="140" y="167" fill="#565f89" font-family="monospace" font-size="13">│</text>
-  <text x="152" y="167" fill="#9ece6a" font-family="monospace" font-size="13">▓▓▓▓▓▓▓░░░</text>
-  <text x="246" y="167" fill="#c0caf5" font-family="monospace" font-size="13">67.3%</text>
-  <text x="286" y="167" fill="#565f89" font-family="monospace" font-size="13">│</text>
-  <text x="298" y="167" fill="#7dcfff" font-family="monospace" font-size="13">my-app</text>
-  <text x="354" y="167" fill="#e0af68" font-family="monospace" font-size="13">main</text>
-  <text x="394" y="167" fill="#565f89" font-family="monospace" font-size="13">│</text>
-  <text x="406" y="167" fill="#565f89" font-family="monospace" font-size="13">1h24m</text>
-  <text x="450" y="167" fill="#9ece6a" font-family="monospace" font-size="13">5h:35%</text>
-  <text x="502" y="167" fill="#565f89" font-family="monospace" font-size="13">7d:12%</text>
+  <text x="118" y="167" fill="#9ece6a" font-family="monospace" font-size="13"> ● </text>
+  <text x="138" y="167" fill="#9ece6a" font-family="monospace" font-size="13">h</text>
+  <text x="148" y="167" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
+  <text x="168" y="167" fill="#9ece6a" font-family="monospace" font-size="13">▓▓▓▓▓▓▓░░░</text>
+  <text x="262" y="167" fill="#c0caf5" font-family="monospace" font-size="13">67.3%</text>
+  <text x="302" y="167" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
+  <text x="322" y="167" fill="#7dcfff" font-family="monospace" font-size="13">my-app/src/components</text>
+  <text x="518" y="167" fill="#e0af68" font-family="monospace" font-size="13"> main</text>
+  <text x="558" y="167" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
+  <text x="578" y="167" fill="#565f89" font-family="monospace" font-size="13">1h24m</text>
+  <text x="622" y="167" fill="#9ece6a" font-family="monospace" font-size="13">5h:35%</text>
+  <text x="674" y="167" fill="#565f89" font-family="monospace" font-size="13">7d:12%</text>
 
   <!-- Narrow terminal (80 cols) -->
   <text x="30" y="208" fill="#565f89" font-family="monospace" font-size="11">Terminal 80 cols</text>
   <rect x="30" y="216" width="360" height="32" rx="6" fill="#1f2335"/>
-  <text x="42" y="237" fill="#bb9af7" font-family="monospace" font-size="13" font-weight="bold">Opus</text>
-  <text x="82" y="237" fill="#9ece6a" font-family="monospace" font-size="13">● h</text>
-  <text x="104" y="237" fill="#565f89" font-family="monospace" font-size="13">│</text>
-  <text x="116" y="237" fill="#e0af68" font-family="monospace" font-size="13">▓▓▓▓▓▓▓░░░</text>
-  <text x="210" y="237" fill="#c0caf5" font-family="monospace" font-size="13">67.3%</text>
-  <text x="250" y="237" fill="#565f89" font-family="monospace" font-size="13">│</text>
-  <text x="262" y="237" fill="#e0af68" font-family="monospace" font-size="13">main</text>
-  <text x="298" y="237" fill="#565f89" font-family="monospace" font-size="13">│</text>
-  <text x="310" y="237" fill="#565f89" font-family="monospace" font-size="13">1h24m</text>
+  <text x="42" y="237" fill="#bb9af7" font-family="monospace" font-size="13" font-weight="bold">Opus 4.7</text>
+  <text x="118" y="237" fill="#9ece6a" font-family="monospace" font-size="13"> ● </text>
+  <text x="138" y="237" fill="#9ece6a" font-family="monospace" font-size="13">h</text>
+  <text x="148" y="237" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
+  <text x="168" y="237" fill="#c0caf5" font-family="monospace" font-size="13">67%</text>
+  <text x="198" y="237" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
+  <text x="218" y="237" fill="#7dcfff" font-family="monospace" font-size="13">my-app/…/components</text>
+  <text x="358" y="237" fill="#e0af68" font-family="monospace" font-size="13"> main</text>
+  <text x="398" y="237" fill="#565f89" font-family="monospace" font-size="13"> │ </text>
+  <text x="418" y="237" fill="#565f89" font-family="monospace" font-size="13">1h24m</text>
+  <text x="458" y="237" fill="#9ece6a" font-family="monospace" font-size="13">5h:35%</text>
+  <text x="510" y="237" fill="#565f89" font-family="monospace" font-size="13">7d:12%</text>
 
   <!-- Footer -->
   <text x="450" y="272" text-anchor="middle" fill="#414868" font-family="monospace" font-size="10">Responsive layout adapts from 200+ to 4 columns — zero overflow guarantee</text>

@@ -1,5 +1,7 @@
 # Claude Statusline Pro Max
 
+[English Documentation](README.md)
+
 [Claude Code](https://claude.ai/code) CLI 的响应式信息密集状态栏。纯 bash 脚本 — 除 `jq` 外零依赖。
 
 ![预览](docs/preview.svg)
@@ -100,8 +102,6 @@ Opus 4.7 ● h │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-app/s
 - [自定义](docs/zh/CUSTOMIZATION.md) — 主题和视觉调整
 - [兼容性](docs/zh/COMPATIBILITY.md) — 平台和终端支持
 - [更新日志](docs/zh/CHANGELOG.md) — 版本历史
-
-[English Documentation](README.md)
 
 ## 依赖
 

@@ -1,5 +1,7 @@
 # Claude Statusline Pro Max
 
+[中文文档](README.zh-CN.md)
+
 A responsive, information-dense statusline for [Claude Code](https://claude.ai/code) CLI. Pure bash script — zero dependencies beyond `jq`.
 
 ![preview](docs/preview.svg)
@@ -100,8 +102,6 @@ All configuration is via `~/.claude/settings.json`:
 - [Customization](docs/CUSTOMIZATION.md) — Theming and visual tweaks
 - [Compatibility](docs/COMPATIBILITY.md) — Platform and terminal support
 - [Changelog](docs/CHANGELOG.md) — Release history
-
-[中文文档](README.zh-CN.md)
 
 ## Requirements
 
