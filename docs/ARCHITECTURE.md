@@ -20,7 +20,7 @@ Zone 1: Model    │  Zone 2: Context  │  Zone 3: Workspace  │  Zone 4: Dura
 
 - Model name with color coding (Opus=magenta, Sonnet=blue, Haiku=cyan, other=green)
 - Thinking indicator: `●` when extended thinking is enabled
-- Effort level: `⬆`/`⬆⬆`/`⬆⬆⬆` marks for high/xhigh/max
+- Effort level: `h`/`x`/`M` suffix for high/xhigh/max
 - Agent indicator: `●` prefix when agent is active
 - **Family-preserving truncation**: extracts family keyword + version chain, skips "claude" prefix and date stamps
   - `claude-opus-4-7` → mid: `opus-4-7`, short: `opus`
@@ -54,7 +54,7 @@ Rationale: `total_input_tokens`/`total_output_tokens` are cumulative across the 
 - `path_mid` truncation: project name capped at 20 chars (consistent with root case)
 - Git branch: schema fields first (`wt_branch`, `git_worktree`, `worktree_name`), then `git` command with 5s cache
 - Branch gets `│` prefix when path is empty (visual distinction from context zone)
-- Vim mode indicator: `🔄` INSERT, `👁` VISUAL
+- Vim mode indicator: `[N]` NORMAL, `[I]` INSERT, `[V]` VISUAL
 
 ### Zone 4 — Duration
 

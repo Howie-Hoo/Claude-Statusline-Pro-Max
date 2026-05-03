@@ -65,13 +65,15 @@ fi
 
 | 标记 | 含义 | 变量 |
 |------|------|------|
-| `●` | 代理活跃 | `agent_mark` |
 | `●` | 思考已启用 | `think_mark` |
-| `⬆` | 努力：high | `effort_mark` |
-| `⬆⬆` | 努力：xhigh | `effort_mark` |
-| `⬆⬆⬆` | 努力：max | `effort_mark` |
-| `🔄` | Vim：INSERT | `vim_mark` |
-| `👁` | Vim：VISUAL | `vim_mark` |
+| `●` | 代理活跃 | `agent_mark` |
+| `h` | 努力：high | `effort_mark` |
+| `x` | 努力：xhigh | `effort_mark` |
+| `M` | 努力：max | `effort_mark` |
+| `[N]` | Vim：NORMAL | `vim_mark` |
+| `[I]` | Vim：INSERT | `vim_mark` |
+| `[V]` | Vim：VISUAL | `vim_mark` |
+| `[V-L]` | Vim：VISUAL LINE | `vim_mark` |
 | `│` | 区域分隔符 | `sep` |
 | `▓` | 进度条填充格 | — |
 | `░` | 进度条空白格 | — |

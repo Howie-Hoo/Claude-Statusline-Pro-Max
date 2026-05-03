@@ -32,7 +32,7 @@ cp statusline-command.sh ~/.claude/statusline-command.sh
 ## The 4 Zones
 
 ```
-Opus 4.7 ●🧠⬆ │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-app/src/components  main │ 1h24m 5h:35% 7d:12%
+Opus 4.7 ● h │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-app/src/components  main │ 1h24m 5h:35% 7d:12%
 └──── Model ────┘ └──────── Context ─────────────┘ └──── Workspace ──────┘ └──── Duration ────┘
 ```
 
@@ -69,13 +69,14 @@ At narrow terminals, content truncates progressively:
 
 | Mark | Meaning |
 |------|---------|
+| ● | Thinking enabled |
 | ● | Agent active |
-| 🧠 | Thinking enabled |
-| ⬆ | Effort: high |
-| ⬆⬆ | Effort: xhigh |
-| ⬆⬆⬆ | Effort: max |
-| 🔄 | Vim: INSERT |
-| 👁 | Vim: VISUAL |
+| h | Effort: high |
+| x | Effort: xhigh |
+| M | Effort: max |
+| [N] | Vim: NORMAL |
+| [I] | Vim: INSERT |
+| [V] | Vim: VISUAL |
 
 ## Configuration
 
@@ -98,6 +99,9 @@ All configuration is via `~/.claude/settings.json`:
 - [Architecture](docs/ARCHITECTURE.md) — Internal design and data flow
 - [Customization](docs/CUSTOMIZATION.md) — Theming and visual tweaks
 - [Compatibility](docs/COMPATIBILITY.md) — Platform and terminal support
+- [Changelog](docs/CHANGELOG.md) — Release history
+
+[中文文档](README.zh-CN.md)
 
 ## Requirements
 

@@ -32,7 +32,7 @@
 ## 4 个区域
 
 ```
-Opus 4.7 ●🧠⬆ │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-app/src/components  main │ 1h24m 5h:35% 7d:12%
+Opus 4.7 ● h │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-app/src/components  main │ 1h24m 5h:35% 7d:12%
 └──── 模型 ────┘ └──────── 上下文 ─────────────┘ └──── 工作区 ──────┘ └──── 时长 ────┘
 ```
 
@@ -69,13 +69,14 @@ Opus 4.7 ●🧠⬆ │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-
 
 | 标记 | 含义 |
 |------|------|
+| ● | 思考已启用 |
 | ● | 代理活跃 |
-| 🧠 | 思考已启用 |
-| ⬆ | 努力：high |
-| ⬆⬆ | 努力：xhigh |
-| ⬆⬆⬆ | 努力：max |
-| 🔄 | Vim：INSERT |
-| 👁 | Vim：VISUAL |
+| h | 努力：high |
+| x | 努力：xhigh |
+| M | 努力：max |
+| [N] | Vim：NORMAL |
+| [I] | Vim：INSERT |
+| [V] | Vim：VISUAL |
 
 ## 配置
 
@@ -98,6 +99,9 @@ Opus 4.7 ●🧠⬆ │ ▓▓▓▓▓▓▓░░░ 67.3% 80.0k/50.0k │ my-
 - [架构](docs/zh/ARCHITECTURE.md) — 内部设计和数据流
 - [自定义](docs/zh/CUSTOMIZATION.md) — 主题和视觉调整
 - [兼容性](docs/zh/COMPATIBILITY.md) — 平台和终端支持
+- [更新日志](docs/zh/CHANGELOG.md) — 版本历史
+
+[English Documentation](README.md)
 
 ## 依赖
 

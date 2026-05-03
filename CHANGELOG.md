@@ -55,7 +55,7 @@ Initial release.
 - Color-coded model families (Opus=magenta, Sonnet=blue, Haiku=cyan)
 - Context progress bar with color thresholds at 70%/86%
 - Git branch cache (5-second TTL)
-- Thinking/effort/agent marks
+- Thinking/effort/agent marks (● h/x/M)
 - Vim mode indicator
 - Duration compound format (1h24m)
 - Rate limit display

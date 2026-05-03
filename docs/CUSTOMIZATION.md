@@ -65,13 +65,15 @@ fi
 
 | Mark | Meaning | Variable |
 |------|---------|----------|
-| `●` | Agent active | `agent_mark` |
 | `●` | Thinking enabled | `think_mark` |
-| `⬆` | Effort: high | `effort_mark` |
-| `⬆⬆` | Effort: xhigh | `effort_mark` |
-| `⬆⬆⬆` | Effort: max | `effort_mark` |
-| `🔄` | Vim: INSERT | `vim_mark` |
-| `👁` | Vim: VISUAL | `vim_mark` |
+| `●` | Agent active | `agent_mark` |
+| `h` | Effort: high | `effort_mark` |
+| `x` | Effort: xhigh | `effort_mark` |
+| `M` | Effort: max | `effort_mark` |
+| `[N]` | Vim: NORMAL | `vim_mark` |
+| `[I]` | Vim: INSERT | `vim_mark` |
+| `[V]` | Vim: VISUAL | `vim_mark` |
+| `[V-L]` | Vim: VISUAL LINE | `vim_mark` |
 | `│` | Zone separator | `sep` |
 | `▓` | Bar filled cell | — |
 | `░` | Bar empty cell | — |
