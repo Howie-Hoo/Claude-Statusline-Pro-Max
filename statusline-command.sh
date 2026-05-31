@@ -18,8 +18,6 @@ if ! parsed=$(jq -r '
   "output_tok=" + (.context_window.current_usage.output_tokens // 0 | floor | tostring),
   "cache_create=" + (.context_window.current_usage.cache_creation_input_tokens // 0 | floor | tostring),
   "cache_read=" + (.context_window.current_usage.cache_read_input_tokens // 0 | floor | tostring),
-  "total_input=" + (.context_window.total_input_tokens // 0 | floor | tostring),
-  "total_output=" + (.context_window.total_output_tokens // 0 | floor | tostring),
   "cwd=" + (.workspace.current_dir // .cwd // "" | @sh),
   "project_dir=" + (.workspace.project_dir // "" | @sh),
   "git_worktree=" + (.workspace.git_worktree // "" | @sh),
@@ -35,7 +33,6 @@ if ! parsed=$(jq -r '
 ' <<< "$input" 2>/dev/null) || [ -z "$parsed" ]; then
   model_id="unknown"; model_name="unknown"; used_pct=0; ctx_size=0
   input_tok=0; output_tok=0; cache_create=0; cache_read=0
-  total_input=0; total_output=0
   cwd=""; project_dir=""; git_worktree=""; wt_branch=""
   duration_ms=0; effort_level=""; thinking_enabled="false"
   rate_5h=""; rate_7d=""; agent_name=""; worktree_name=""; vim_mode=""
@@ -222,11 +219,10 @@ fi
 #   TIER 3 (unknown): only ctx_size known → show size, no percentage, no bar
 #   TIER 0 (none):    no data at all → n/a
 #
-# Rationale: total_input_tokens/total_output_tokens are cumulative across the
-# entire session including compacted turns. They always overestimate current
-# context occupancy, and the overestimate grows unbounded with session length.
-# Showing them as a percentage or bar is misleading. Instead, when no real
-# signal exists, show only the context size — honest and stable.
+# Rationale: total_input_tokens/total_output_tokens (as of v2.1.132) reflect
+# current context usage only, not cumulative session totals — redundant with
+# the token counts already shown in TIER 1. Session tokens removed from
+# Zone 4 to avoid duplicate information.
 used_tok=$(( input_tok + output_tok + cache_create + cache_read ))
 ctx_tier=0
 
@@ -431,7 +427,7 @@ case "$vim_mode" in
   "VISUAL LINE") vim_mark=" ${YLW}[V-L]${RST}" ;;
 esac
 
-# ── Zone 4: Duration + Session Tokens ──
+# ── Zone 4: Duration + Rate Limits ──
 dur_str=""
 if [ -n "$duration_ms" ] && [ "$duration_ms" -gt 0 ] 2>/dev/null; then
   dur_s=$(( duration_ms / 1000 ))
@@ -453,14 +449,6 @@ if [ -n "$duration_ms" ] && [ "$duration_ms" -gt 0 ] 2>/dev/null; then
   elif [ "$dur_s" -ge 1 ]; then
     dur_str="${dur_s}s"
   fi
-fi
-
-# Session tokens: cumulative input + output across entire session
-# Displayed as a secondary stat in Zone 4 alongside duration
-session_tok=$(( ${total_input:-0} + ${total_output:-0} ))
-session_str=""
-if [ "$session_tok" -gt 0 ] 2>/dev/null; then
-  fmt_tok "$session_tok"; session_str="$_FT"
 fi
 
 rate_str=""
@@ -517,17 +505,10 @@ visible_len "${YLW}${branch_short}${RST}"; lb_short=$_VL
 # Vim mark
 visible_len "$vim_mark"; lvim=$_VL
 
-# Zone 4 variants: duration + session tokens + rate limits (all 8 flag combinations)
-_z4_full=""; _z4_no_rate=""; _z4_dur_only=""; _z4_dur_rate=""; _z4_session_only=""; _z4_session_rate=""; _z4_rate_only=""; _z4_empty=""
+# Zone 4 variants: duration + rate limits (4 flag combinations)
+_z4_full=""; _z4_dur_only=""; _z4_dur_rate=""; _z4_rate_only=""
 if [ -n "$dur_str" ]; then
-  _z4_full="${GRY}${dur_str}${RST}"; _z4_no_rate="$_z4_full"; _z4_dur_only="$_z4_full"; _z4_dur_rate="$_z4_full"
-fi
-if [ -n "$session_str" ]; then
-  [ -n "$_z4_full" ] && _z4_full="${_z4_full} "
-  _z4_full="${_z4_full}${DIM}${session_str}${RST}"
-  [ -n "$_z4_no_rate" ] && _z4_no_rate="${_z4_no_rate} "
-  _z4_no_rate="${_z4_no_rate}${DIM}${session_str}${RST}"
-  _z4_session_only="${DIM}${session_str}${RST}"
+  _z4_full="${GRY}${dur_str}${RST}"; _z4_dur_only="$_z4_full"; _z4_dur_rate="$_z4_full"
 fi
 if [ -n "$rate_str" ]; then
   [ -n "$_z4_full" ] && _z4_full="${_z4_full} "
@@ -535,26 +516,19 @@ if [ -n "$rate_str" ]; then
   _z4_rate_only="$rate_str"
   [ -n "$_z4_dur_rate" ] && _z4_dur_rate="${_z4_dur_rate} "
   _z4_dur_rate="${_z4_dur_rate}${rate_str}"
-  if [ -n "$_z4_session_only" ]; then
-    _z4_session_rate="${_z4_session_only} ${rate_str}"
-  fi
 fi
 visible_len "$_z4_full"; lz4_full=$_VL
-visible_len "$_z4_no_rate"; lz4_no_rate=$_VL
 visible_len "$_z4_dur_only"; lz4_dur_only=$_VL
 visible_len "$_z4_dur_rate"; lz4_dur_rate=$_VL
-visible_len "$_z4_session_only"; lz4_session_only=$_VL
-visible_len "$_z4_session_rate"; lz4_session_rate=$_VL
 visible_len "$_z4_rate_only"; lz4_rate_only=$_VL
-lz4_empty=0
 
 # try_build: assemble the final output string (no length computation)
 # try_len: compute visible length using pre-computed zone lengths (pure arithmetic)
 # Both share the same parameter signature:
 #   $1=model_key $2=path_key $3=branch_key $4=context_key
-#   $5=show_rate $6=show_vim $7=show_dur $8=show_session
+#   $5=show_rate $6=show_vim $7=show_dur
 try_build() {
-  local m p b c sr="$5" sv="$6" sd="$7" ss="$8"
+  local m p b c sr="$5" sv="$6" sd="$7"
   case "$1" in full) m="$_model_full" ;; mid) m="$_model_mid" ;; short) m="$_model_short" ;; esac
   case "$2" in full) p="$path_full" ;; mid) p="$path_mid" ;; short) p="$path_short" ;; none) p="" ;; esac
   case "$3" in full) b="$branch_full" ;; short) b="$branch_short" ;; none) b="" ;; esac
@@ -575,10 +549,6 @@ try_build() {
   if [ "$sd" = "1" ] && [ -n "$dur_str" ]; then
     zone4="${GRY}${dur_str}${RST}"
   fi
-  if [ "$ss" = "1" ] && [ -n "$session_str" ]; then
-    [ -n "$zone4" ] && zone4="${zone4} "
-    zone4="${zone4}${DIM}${session_str}${RST}"
-  fi
   if [ "$sr" = "1" ] && [ -n "$rate_str" ]; then
     [ -n "$zone4" ] && zone4="${zone4} "
     zone4="${zone4}${rate_str}"
@@ -590,28 +560,20 @@ try_build() {
 }
 
 try_len() {
-  local lm lp lb lc lz4 sv="$6" sd="$7" ss="$8"
+  local lm lp lb lc lz4 sv="$6" sd="$7"
   case "$1" in full) lm=$lm_full ;; mid) lm=$lm_mid ;; short) lm=$lm_short ;; esac
   case "$2" in full) lp=$lp_full ;; mid) lp=$lp_mid ;; short) lp=$lp_short ;; none) lp=0 ;; esac
   case "$3" in full) lb=$lb_full ;; short) lb=$lb_short ;; none) lb=0 ;; esac
   case "$4" in full) lc=$lc_full ;; mid) lc=$lc_mid ;; short) lc=$lc_short ;; esac
-  # Zone 4 length based on flags (covers all 8 combinations of sd, ss, sr)
-  if [ "$sd" = "1" ] && [ "$ss" = "1" ] && [ "$5" = "1" ]; then
-    lz4=$lz4_full
-  elif [ "$sd" = "1" ] && [ "$ss" = "1" ]; then
-    lz4=$lz4_no_rate
-  elif [ "$sd" = "1" ] && [ "$5" = "1" ]; then
+  # Zone 4 length based on flags (4 combinations of sd, sr)
+  if [ "$sd" = "1" ] && [ "$5" = "1" ]; then
     lz4=$lz4_dur_rate
   elif [ "$sd" = "1" ]; then
     lz4=$lz4_dur_only
-  elif [ "$ss" = "1" ] && [ "$5" = "1" ]; then
-    lz4=$lz4_session_rate
-  elif [ "$ss" = "1" ]; then
-    lz4=$lz4_session_only
   elif [ "$5" = "1" ]; then
     lz4=$lz4_rate_only
   else
-    lz4=$lz4_empty
+    lz4=0
   fi
   local total=$(( lm + sep_len + lc ))
   if [ $lp -gt 0 ]; then
@@ -634,93 +596,88 @@ try_len() {
 # ── Progressive truncation levels ──
 # Each level: try_len sets _TL; if _TL ≤ term_cols, try_build and exit
 # Content truncation: path → context → model → branch (progressive)
-# Optional removal: rate limits → vim → session tokens → duration → path
+# Optional removal: rate limits → vim → duration → path
 
 # L0: full model + full path + full branch + bar+%+token + all optional
-try_len full full full full 1 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
-  try_build full full full full 1 1 1 1; exit 0
+try_len full full full full 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
+  try_build full full full full 1 1 1; exit 0
 fi
 
 # L1: full model + mid path + full branch + bar+%+token + all optional
-try_len full mid full full 1 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
-  try_build full mid full full 1 1 1 1; exit 0
+try_len full mid full full 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
+  try_build full mid full full 1 1 1; exit 0
 fi
 
 # L2: full model + mid path + full branch + %+token (bar removed)
-try_len full mid full mid 1 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
-  try_build full mid full mid 1 1 1 1; exit 0
+try_len full mid full mid 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
+  try_build full mid full mid 1 1 1; exit 0
 fi
 
 # L2a: full model + mid path + full branch + % only
-try_len full mid full short 1 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
-  try_build full mid full short 1 1 1 1; exit 0
+try_len full mid full short 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
+  try_build full mid full short 1 1 1; exit 0
 fi
 
 # L2b: full model + mid path + short branch + % only
-try_len full mid short short 1 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
-  try_build full mid short short 1 1 1 1; exit 0
+try_len full mid short short 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
+  try_build full mid short short 1 1 1; exit 0
 fi
 
 # L3: full model + short path + full branch + %+token
-try_len full short full mid 1 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
-  try_build full short full mid 1 1 1 1; exit 0
+try_len full short full mid 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
+  try_build full short full mid 1 1 1; exit 0
 fi
 
 # L3a: full model + short path + short branch + %+token
-try_len full short short mid 1 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
-  try_build full short short mid 1 1 1 1; exit 0
+try_len full short short mid 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
+  try_build full short short mid 1 1 1; exit 0
 fi
 
 # L4: mid model + short path + full branch + %+token
-try_len mid short full mid 1 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
-  try_build mid short full mid 1 1 1 1; exit 0
+try_len mid short full mid 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
+  try_build mid short full mid 1 1 1; exit 0
 fi
 
 # L5: mid model + short path + short branch + %+token
-try_len mid short short mid 1 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
-  try_build mid short short mid 1 1 1 1; exit 0
+try_len mid short short mid 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
+  try_build mid short short mid 1 1 1; exit 0
 fi
 
 # L6: short model + short path + short branch + %+token
-try_len short short short mid 1 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
-  try_build short short short mid 1 1 1 1; exit 0
+try_len short short short mid 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
+  try_build short short short mid 1 1 1; exit 0
 fi
 
 # L7: short model + short path + short branch + % only
-try_len short short short short 1 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
-  try_build short short short short 1 1 1 1; exit 0
+try_len short short short short 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
+  try_build short short short short 1 1 1; exit 0
 fi
 
 # ── Progressive optional element removal ──
 
 # L8: drop rate limits
-try_len short short short short 0 1 1 1; if [ "$_TL" -le "$term_cols" ]; then
-  try_build short short short short 0 1 1 1; exit 0
+try_len short short short short 0 1 1; if [ "$_TL" -le "$term_cols" ]; then
+  try_build short short short short 0 1 1; exit 0
 fi
 
 # L9: drop rate + vim
-try_len short short short short 0 0 1 1; if [ "$_TL" -le "$term_cols" ]; then
-  try_build short short short short 0 0 1 1; exit 0
+try_len short short short short 0 0 1; if [ "$_TL" -le "$term_cols" ]; then
+  try_build short short short short 0 0 1; exit 0
 fi
 
-# L10: drop rate + vim + session tokens
-try_len short short short short 0 0 1 0; if [ "$_TL" -le "$term_cols" ]; then
-  try_build short short short short 0 0 1 0; exit 0
+# L10: drop duration too
+try_len short short short short 0 0 0; if [ "$_TL" -le "$term_cols" ]; then
+  try_build short short short short 0 0 0; exit 0
 fi
 
-# L11: drop duration too
-try_len short short short short 0 0 0 0; if [ "$_TL" -le "$term_cols" ]; then
-  try_build short short short short 0 0 0 0; exit 0
-fi
-
-# L12: drop path too (model + context % + branch only)
-try_len short none short short 0 0 0 0; if [ "$_TL" -le "$term_cols" ]; then
-  try_build short none short short 0 0 0 0; exit 0
+# L11: drop path too (model + context % + branch only)
+try_len short none short short 0 0 0; if [ "$_TL" -le "$term_cols" ]; then
+  try_build short none short short 0 0 0; exit 0
 fi
 
 # Fallback: model + context % only (no path, no branch)
-try_len short none none short 0 0 0 0; if [ "$_TL" -le "$term_cols" ]; then
-  try_build short none none short 0 0 0 0; exit 0
+try_len short none none short 0 0 0; if [ "$_TL" -le "$term_cols" ]; then
+  try_build short none none short 0 0 0; exit 0
 fi
 
 # Emergency: model name only

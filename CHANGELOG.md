@@ -2,6 +2,30 @@
 
 All notable changes to Claude-Statusline-Pro-Max are documented here.
 
+## v1.2.0 — 2026-06-01
+
+Remove session tokens display (redundant with Zone 2 context info).
+
+### Breaking Changes
+
+- **Session tokens removed from Zone 4**: The `total_input_tokens`/`total_output_tokens` fields from Claude Code v2.1.132+ now reflect current context usage (not cumulative session totals), making them redundant with Zone 2's token counts. Removed to eliminate duplicate information.
+
+### Architecture
+
+- **Zone 4 simplified**: Duration + rate limits only (was duration + session tokens + rate limits)
+- **Zone 4 variants reduced**: 4 flag combinations (was 8)
+- **Responsive levels reduced**: 12 levels + 2 fallbacks (was 15 + 2)
+- **try_build/try_len signature**: 7 parameters (was 8, removed `show_session`)
+- **Optional element removal order**: rate limits → vim → duration → path (was rate limits → vim → session tokens → duration → path)
+
+### Code Changes
+
+- Removed `total_input`/`total_output` from jq parsing and default variable initialization
+- Removed `session_tok`/`session_str` calculation and display logic
+- Removed `_z4_no_rate`, `_z4_session_only`, `_z4_session_rate`, `_z4_empty` Zone 4 variants
+- Renumbered responsive levels L10→L10, L11→L10, L12→L11 (removed old L10 "drop session tokens")
+- Updated CLAUDE.md architecture documentation
+
 ## v1.1.0 — 2026-05-02
 
 Incremental improvements: TIER signal quality, responsive coverage gaps, CJK/emoji safety, and bug fixes.

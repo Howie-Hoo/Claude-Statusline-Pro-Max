@@ -44,7 +44,7 @@ Four zones separated by `│`:
 1. **Model** — family-preserving name truncation + thinking/effort/agent marks, color-coded by family (Opus=magenta, Sonnet=blue, Haiku=cyan)
 2. **Context** — TIER-based display with progress bar, color thresholds at 70%/86%
 3. **Workspace** — project name + relative path + git branch + vim mode
-4. **Duration** — compound format (`1h24m`) + session tokens + rate limits
+4. **Duration** — compound format (`1h24m`) + rate limits
 
 ### Context TIER System
 
@@ -57,7 +57,7 @@ Four zones separated by `│`:
 
 ### Responsive System
 
-`try_build(m, p, b, c, show_rate, show_vim, show_dur, show_session)` assembles a candidate string. `try_len` computes width via pure arithmetic using pre-computed zone lengths (zero-fork). 15 levels (L0-L12 + L2a/L2b/L3a) + 2 fallbacks + emergency try progressively truncated parameters; first fit wins and exits. Content truncation order: path → context → model → branch. Optional element removal: rate limits → vim → session tokens → duration → path. Emergency fallback truncates by display width (not char count) to handle CJK/emoji.
+`try_build(m, p, b, c, show_rate, show_vim, show_dur)` assembles a candidate string. `try_len` computes width via pure arithmetic using pre-computed zone lengths (zero-fork). 12 levels (L0-L11 + L2a/L2b/L3a) + 2 fallbacks + emergency try progressively truncated parameters; first fit wins and exits. Content truncation order: path → context → model → branch. Optional element removal: rate limits → vim → duration → path. Emergency fallback truncates by display width (not char count) to handle CJK/emoji.
 
 ### Visible Length
 
