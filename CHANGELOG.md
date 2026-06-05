@@ -2,6 +2,44 @@
 
 All notable changes to Claude-Statusline-Pro-Max are documented here.
 
+## v1.3.0 — 2026-06-05
+
+Claude Code v2.1.163 compatibility: thinking modes, new indicators, ultracode support, and expanded metrics.
+
+### Features
+
+- **Adaptive thinking mark**: `◉` when `thinking.type=adaptive`, `●` for legacy `enabled` mode. Forward-compatible with upcoming Claude Code API changes.
+- **Ultracode effort level**: `◆` (purple bold) when `effort.level=ultracode` (xhigh + dynamic workflow orchestration).
+- **Fast mode indicator**: `⚡` in Zone 1 when fast mode is active.
+- **Remote session indicator**: `🌐` in Zone 1 when connected remotely.
+- **PR number display**: `#123` in Zone 3 when reviewing a pull request.
+- **Lines changed metrics**: `+123` (green) / `-45` (red) in Zone 4 alongside duration.
+- **Context overflow detection**: Color forced to red when `exceeds_200k_tokens=true` and usage > 85%, signaling auto-compaction is disabled at a critical threshold.
+
+### Schema
+
+- New jq extractions: `thinking_type`, `fast_mode`, `exceeds_200k`, `lines_added`, `lines_removed`, `remote_session`, `pr_number`
+- All new fields have `// false` or `// ""` fallbacks — fully backward compatible
+
+### Architecture
+
+- **Zone 4 variants**: 5 pre-computed flag combinations (was 4), adding `lines_only` variant
+- **try_build simplified**: Zone 4 string assembly now selects from pre-computed variants instead of rebuilding
+- **n3sw character list**: Extended to 8 entries for new marks (`◉◆⚠`)
+- **pr_mark optimization**: `visible_len` skipped when PR mark is empty (common case)
+
+### Bug Fixes
+
+- **`_z4_dur_only` / `_z4_dur_rate` empty when duration absent**: Fixed seed logic so lines-only display works correctly at responsive levels where duration is removed
+- **`_z4_lines_only` not pre-computed**: Fixed missing variant causing overflow in lines-only scenarios at narrow widths
+
+### Testing
+
+- 50 scenarios × 17 terminal widths (4–200 cols): zero overflow
+- All effort levels verified (low/medium/high/xhigh/ultracode/max)
+- All thinking mode combinations verified
+- Third-party provider backward compatibility verified
+
 ## v1.2.0 — 2026-06-01
 
 Remove session tokens display (redundant with Zone 2 context info).

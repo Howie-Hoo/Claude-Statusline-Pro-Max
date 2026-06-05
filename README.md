@@ -34,16 +34,16 @@ cp statusline-command.sh ~/.claude/statusline-command.sh
 ## The 4 Zones
 
 ```
-Opus 4.7 ● h │ ▓▓▓▓▓▓░░░░ 67% 130.0k/200.0k │ my-app/src/components main │ 1h24m 130.0k 5h:35% 7d:12%
-└──── Model ────┘ └──────── Context ─────────────┘ └──── Workspace ──────┘ └──── Duration ────┘
+Opus 4.8 ◉ ◆ ⚡ │ ▓▓▓▓▓▓░░░░ 67% 130.0k/200.0k │ my-app/src/components main #42 │ 1h24m +123 -45 5h:35% 7d:12%
+└───── Model ─────┘ └──────── Context ───────────┘ └────── Workspace ─────────┘ └────── Duration ───────┘
 ```
 
 | Zone | Content | Color Logic |
 |------|---------|-------------|
-| **Model** | Name + thinking/effort/agent marks | Opus=magenta, Sonnet=blue, Haiku=cyan |
-| **Context** | Progress bar + % + token counts | Green <70%, Yellow 70-86%, Red >86% |
-| **Workspace** | Project + relative path + git branch + vim mode | — |
-| **Duration** | Elapsed time + session tokens + rate limits | Rate: Green ≤59%, Yellow 60-84%, Red ≥85% |
+| **Model** | Name + thinking/effort/fast/remote/agent marks | Opus=magenta, Sonnet=blue, Haiku=cyan |
+| **Context** | Progress bar + % + token counts | Green <70%, Yellow 70-85%, Red >85% |
+| **Workspace** | Project + relative path + git branch + vim + PR | — |
+| **Duration** | Elapsed time + lines changed + rate limits | Rate: Green ≤59%, Yellow 60-84%, Red ≥85% |
 
 ## Context TIER System
 
@@ -61,7 +61,7 @@ The context zone adapts to signal quality — never shows misleading data:
 At narrow terminals, content truncates progressively:
 
 1. Rate limits drop first
-2. Then vim mode, session tokens, duration
+2. Then vim mode, duration
 3. Then path shortens (full → mid → short)
 4. Then context simplifies (full → mid → short)
 5. Then model name shortens (full → mid → short/family)
@@ -69,17 +69,23 @@ At narrow terminals, content truncates progressively:
 
 ## Marks
 
-| Mark | Meaning |
-|------|---------|
-| ● | Thinking enabled |
-| @name | Agent active (first 8 chars) |
-| h | Effort: high |
-| x | Effort: xhigh |
-| M | Effort: max |
-| [N] | Vim: NORMAL |
-| [I] | Vim: INSERT |
-| [V] | Vim: VISUAL |
-| [V-L] | Vim: VISUAL LINE |
+| Mark | Meaning | Zone |
+|------|---------|------|
+| ◉ | Adaptive thinking | Zone 1 |
+| ● | Legacy thinking enabled | Zone 1 |
+| ◆ | Ultracode (xhigh + workflow) | Zone 1 |
+| x | Effort: xhigh | Zone 1 |
+| h | Effort: high | Zone 1 |
+| M | Effort: max | Zone 1 |
+| ⚡ | Fast mode active | Zone 1 |
+| 🌐 | Remote session active | Zone 1 |
+| @name | Agent active (first 8 chars) | Zone 1 |
+| #N | PR number | Zone 3 |
+| [N] | Vim: NORMAL | Zone 3 |
+| [I] | Vim: INSERT | Zone 3 |
+| [V] | Vim: VISUAL | Zone 3 |
+| [V-L] | Vim: VISUAL LINE | Zone 3 |
+| +N/-N | Lines added/removed | Zone 4 |
 
 ## Configuration
 

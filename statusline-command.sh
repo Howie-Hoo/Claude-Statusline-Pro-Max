@@ -25,17 +25,26 @@ if ! parsed=$(jq -r '
   "duration_ms=" + (.cost.total_duration_ms // 0 | floor | tostring),
   "effort_level=" + (.effort.level // "" | @sh),
   "thinking_enabled=" + (.thinking.enabled // false | tostring),
+  "thinking_type=" + (.thinking.type // "" | @sh),
+  "fast_mode=" + (.fast_mode // false | tostring),
+  "exceeds_200k=" + (.exceeds_200k_tokens // false | tostring),
+  "lines_added=" + (.cost.total_lines_added // 0 | floor | tostring),
+  "lines_removed=" + (.cost.total_lines_removed // 0 | floor | tostring),
   "rate_5h=" + (.rate_limits.five_hour.used_percentage // "" | @sh),
   "rate_7d=" + (.rate_limits.seven_day.used_percentage // "" | @sh),
   "agent_name=" + (.agent.name // "" | @sh),
   "worktree_name=" + (.worktree.name // "" | @sh),
-  "vim_mode=" + (.vim.mode // "" | @sh)
+  "vim_mode=" + (.vim.mode // "" | @sh),
+  "remote_session=" + (.remote.session_id // "" | @sh),
+  "pr_number=" + (.pr.number // 0 | floor | tostring)
 ' <<< "$input" 2>/dev/null) || [ -z "$parsed" ]; then
   model_id="unknown"; model_name="unknown"; used_pct=0; ctx_size=0
   input_tok=0; output_tok=0; cache_create=0; cache_read=0
   cwd=""; project_dir=""; git_worktree=""; wt_branch=""
-  duration_ms=0; effort_level=""; thinking_enabled="false"
+  duration_ms=0; effort_level=""; thinking_enabled="false"; thinking_type=""
+  fast_mode="false"; exceeds_200k="false"; lines_added=0; lines_removed=0
   rate_5h=""; rate_7d=""; agent_name=""; worktree_name=""; vim_mode=""
+  remote_session=""; pr_number=0
 else
   eval "$parsed"
   # Sanitize newlines — single-line statusbar invariant
@@ -82,6 +91,9 @@ visible_len() {
   _t="${s//▓/}"; n3sw=$(( n3sw + (char_count - ${#_t}) ))
   _t="${s//░/}"; n3sw=$(( n3sw + (char_count - ${#_t}) ))
   _t="${s//●/}"; n3sw=$(( n3sw + (char_count - ${#_t}) ))
+  _t="${s//◉/}"; n3sw=$(( n3sw + (char_count - ${#_t}) ))
+  _t="${s//◆/}"; n3sw=$(( n3sw + (char_count - ${#_t}) ))
+  _t="${s//⚠/}"; n3sw=$(( n3sw + (char_count - ${#_t}) ))
   _t="${s//…/}"; n3sw=$(( n3sw + (char_count - ${#_t}) ))
   _VL=$(( char_count + (byte_count - char_count - n4) / 2 - n3sw ))
 }
@@ -108,16 +120,27 @@ case "$model_id" in
 esac
 
 think_mark=""
-[ "$thinking_enabled" = "true" ] && think_mark=" ${BOLD}${GRN}●${RST}"
+if [ "$thinking_type" = "adaptive" ]; then
+  think_mark=" ${BOLD}${GRN}◉${RST}"
+elif [ "$thinking_enabled" = "true" ]; then
+  think_mark=" ${BOLD}${GRN}●${RST}"
+fi
 
 effort_mark=""
 case "$effort_level" in
-  low)    effort_mark=" ${DIM}l${RST}" ;;
-  medium) effort_mark=" ${DIM}m${RST}" ;;
-  high)   effort_mark=" ${GRY}h${RST}" ;;
-  xhigh)  effort_mark=" ${BOLD}x${RST}" ;;
-  max)    effort_mark=" ${BOLD}M${RST}" ;;
+  low)       effort_mark=" ${DIM}l${RST}" ;;
+  medium)    effort_mark=" ${DIM}m${RST}" ;;
+  high)      effort_mark=" ${GRY}h${RST}" ;;
+  xhigh)     effort_mark=" ${BOLD}x${RST}" ;;
+  ultracode) effort_mark=" ${BOLD}${MGN}◆${RST}" ;;
+  max)       effort_mark=" ${BOLD}M${RST}" ;;
 esac
+
+fast_mark=""
+[ "$fast_mode" = "true" ] && fast_mark=" ${YLW}⚡${RST}"
+
+remote_mark=""
+[ -n "$remote_session" ] && remote_mark=" ${DIM}🌐${RST}"
 
 agent_mark=""
 [ -n "$agent_name" ] && agent_mark=" ${GRY}@${agent_name:0:8}${RST}"
@@ -223,6 +246,12 @@ fi
 # current context usage only, not cumulative session totals — redundant with
 # the token counts already shown in TIER 1. Session tokens removed from
 # Zone 4 to avoid duplicate information.
+#
+# Overflow warning: when context usage approaches the model's window size,
+# auto-compaction may be triggered or (if exceeds_200k) disabled entirely.
+# Warning thresholds are proportional to the actual context_window_size:
+# Color thresholds: green ≤69%, yellow 70-85%, red >85%.
+# When exceeds_200k_tokens=true and usage >85%, force red (no safety net).
 used_tok=$(( input_tok + output_tok + cache_create + cache_read ))
 ctx_tier=0
 
@@ -240,6 +269,16 @@ elif [ "$ctx_size" -gt 0 ] 2>/dev/null; then
   ctx_tier=3
 fi
 
+# Context warning: when auto-compaction is disabled (exceeds_200k_tokens=true)
+# and usage exceeds 85%, force the display color to red regardless of the
+# normal threshold. This makes the bar and percentage turn red when the
+# user is genuinely at risk of hitting the context limit without a safety net.
+ctx_force_red="false"
+if [ "$exceeds_200k" = "true" ] && [ "$ctx_tier" -ge 1 ] 2>/dev/null; then
+  pct_int=${used_pct%.*}
+  [ "$pct_int" -gt 85 ] 2>/dev/null && ctx_force_red="true"
+fi
+
 if [ "$ctx_tier" -eq 1 ]; then
   # ── TIER 1: Full fidelity display ──
   pct_int=${used_pct%.*}
@@ -251,6 +290,7 @@ if [ "$ctx_tier" -eq 1 ]; then
   elif [ "$pct_int" -gt 69 ]; then ctx_color=$YLW
   else ctx_color=$GRN
   fi
+  [ "$ctx_force_red" = "true" ] && ctx_color=$RED
 
   fmt_tok "$used_tok"; used_f=$_FT
   fmt_tok "$ctx_size"; total_f=$_FT
@@ -276,6 +316,7 @@ elif [ "$ctx_tier" -eq 2 ]; then
   elif [ "$pct_int" -gt 69 ]; then ctx_color=$YLW
   else ctx_color=$GRN
   fi
+  [ "$ctx_force_red" = "true" ] && ctx_color=$RED
 
   fmt_tok "$ctx_size"; total_f=$_FT
 
@@ -418,6 +459,10 @@ else
   branch_short="$branch"
 fi
 
+# PR number: show in workspace zone when reviewing a PR
+pr_mark=""
+[ "$pr_number" -gt 0 ] 2>/dev/null && pr_mark=" ${GRY}#${pr_number}${RST}"
+
 # Vim mode indicator
 vim_mark=""
 case "$vim_mode" in
@@ -451,6 +496,11 @@ if [ -n "$duration_ms" ] && [ "$duration_ms" -gt 0 ] 2>/dev/null; then
   fi
 fi
 
+# Lines added/removed: show as +N/-N when non-zero
+lines_str=""
+[ "$lines_added" -gt 0 ] 2>/dev/null && lines_str=" ${GRN}+${lines_added}${RST}"
+[ "$lines_removed" -gt 0 ] 2>/dev/null && lines_str="${lines_str} ${RED}-${lines_removed}${RST}"
+
 rate_str=""
 if [ -n "$rate_5h" ]; then
   r5h_int=${rate_5h%.*}; [ -z "$r5h_int" ] && r5h_int=0
@@ -480,10 +530,11 @@ fi
 sep="${GRY} │ ${RST}"
 sep_len=3  # visible width of " │ "
 
-# Model zone: name + think_mark + effort_mark + agent_mark
-_model_full="${m_color}${BOLD}${m_full}${RST}${think_mark}${effort_mark}${agent_mark}"
-_model_mid="${m_color}${BOLD}${m_mid}${RST}${think_mark}${effort_mark}${agent_mark}"
-_model_short="${m_color}${BOLD}${m_short}${RST}${think_mark}${effort_mark}${agent_mark}"
+# Model zone: name + marks in priority order
+#   thinking type (adaptive ◉ / legacy ●) → effort level → fast mode ⚡ → remote 🌐 → agent @name
+_model_full="${m_color}${BOLD}${m_full}${RST}${think_mark}${effort_mark}${fast_mark}${remote_mark}${agent_mark}"
+_model_mid="${m_color}${BOLD}${m_mid}${RST}${think_mark}${effort_mark}${fast_mark}${remote_mark}${agent_mark}"
+_model_short="${m_color}${BOLD}${m_short}${RST}${think_mark}${effort_mark}${fast_mark}${remote_mark}${agent_mark}"
 visible_len "$_model_full"; lm_full=$_VL
 visible_len "$_model_mid"; lm_mid=$_VL
 visible_len "$_model_short"; lm_short=$_VL
@@ -505,10 +556,27 @@ visible_len "${YLW}${branch_short}${RST}"; lb_short=$_VL
 # Vim mark
 visible_len "$vim_mark"; lvim=$_VL
 
-# Zone 4 variants: duration + rate limits (4 flag combinations)
-_z4_full=""; _z4_dur_only=""; _z4_dur_rate=""; _z4_rate_only=""
+# PR mark (skip visible_len when empty — common case)
+if [ -n "$pr_mark" ]; then
+  visible_len "$pr_mark"; lpr=$_VL
+else
+  lpr=0
+fi
+
+# Zone 4 variants: duration + lines + rate limits
+# Pre-compute all flag combinations so try_len is pure arithmetic (zero forks).
+# Variants: full (all), dur_only (sd=1,sr=0), dur_rate (sd=1,sr=1),
+#           rate_only (sd=0,sr=1), lines_only (sd=0,sr=0 but lines present)
+_z4_full=""; _z4_dur_only=""; _z4_dur_rate=""; _z4_rate_only=""; _z4_lines_only=""
 if [ -n "$dur_str" ]; then
-  _z4_full="${GRY}${dur_str}${RST}"; _z4_dur_only="$_z4_full"; _z4_dur_rate="$_z4_full"
+  _z4_full="${GRY}${dur_str}${RST}${lines_str}"; _z4_dur_only="$_z4_full"; _z4_dur_rate="$_z4_full"
+elif [ -n "$lines_str" ]; then
+  _z4_full="${lines_str# }"
+fi
+if [ -n "$lines_str" ]; then
+  _z4_lines_only="${lines_str# }"
+  # Seed dur variants with lines when duration absent (sd=1 falls through to lines)
+  [ -z "$dur_str" ] && { _z4_dur_only="$_z4_lines_only"; _z4_dur_rate="$_z4_lines_only"; }
 fi
 if [ -n "$rate_str" ]; then
   [ -n "$_z4_full" ] && _z4_full="${_z4_full} "
@@ -521,6 +589,7 @@ visible_len "$_z4_full"; lz4_full=$_VL
 visible_len "$_z4_dur_only"; lz4_dur_only=$_VL
 visible_len "$_z4_dur_rate"; lz4_dur_rate=$_VL
 visible_len "$_z4_rate_only"; lz4_rate_only=$_VL
+visible_len "$_z4_lines_only"; lz4_lines_only=$_VL
 
 # try_build: assemble the final output string (no length computation)
 # try_len: compute visible length using pre-computed zone lengths (pure arithmetic)
@@ -545,13 +614,17 @@ try_build() {
     fi
   fi
   [ "$sv" = "1" ] && result="${result}${vim_mark}"
+  [ -n "$pr_mark" ] && result="${result}${pr_mark}"
+  # Select pre-computed Zone 4 variant (same logic as try_len)
   local zone4=""
-  if [ "$sd" = "1" ] && [ -n "$dur_str" ]; then
-    zone4="${GRY}${dur_str}${RST}"
-  fi
-  if [ "$sr" = "1" ] && [ -n "$rate_str" ]; then
-    [ -n "$zone4" ] && zone4="${zone4} "
-    zone4="${zone4}${rate_str}"
+  if [ "$sd" = "1" ] && [ "$sr" = "1" ]; then
+    zone4="$_z4_dur_rate"
+  elif [ "$sd" = "1" ]; then
+    zone4="$_z4_dur_only"
+  elif [ "$sr" = "1" ]; then
+    zone4="$_z4_rate_only"
+  elif [ -n "$_z4_lines_only" ]; then
+    zone4="$_z4_lines_only"
   fi
   if [ -n "$zone4" ]; then
     result="${result}${sep}${zone4}"
@@ -565,13 +638,15 @@ try_len() {
   case "$2" in full) lp=$lp_full ;; mid) lp=$lp_mid ;; short) lp=$lp_short ;; none) lp=0 ;; esac
   case "$3" in full) lb=$lb_full ;; short) lb=$lb_short ;; none) lb=0 ;; esac
   case "$4" in full) lc=$lc_full ;; mid) lc=$lc_mid ;; short) lc=$lc_short ;; esac
-  # Zone 4 length based on flags (4 combinations of sd, sr)
+  # Zone 4 length based on flags
   if [ "$sd" = "1" ] && [ "$5" = "1" ]; then
     lz4=$lz4_dur_rate
   elif [ "$sd" = "1" ]; then
     lz4=$lz4_dur_only
   elif [ "$5" = "1" ]; then
     lz4=$lz4_rate_only
+  elif [ $lz4_lines_only -gt 0 ]; then
+    lz4=$lz4_lines_only
   else
     lz4=0
   fi
@@ -587,6 +662,7 @@ try_len() {
     fi
   fi
   [ "$sv" = "1" ] && total=$(( total + lvim ))
+  [ $lpr -gt 0 ] && total=$(( total + lpr ))
   if [ $lz4 -gt 0 ]; then
     total=$(( total + sep_len + lz4 ))
   fi

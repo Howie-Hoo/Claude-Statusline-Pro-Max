@@ -19,9 +19,12 @@ Zone 1: Model    │  Zone 2: Context  │  Zone 3: Workspace  │  Zone 4: Dura
 ### Zone 1 — Model
 
 - Model name with color coding (Opus=magenta, Sonnet=blue, Haiku=cyan, other=green)
-- Thinking indicator: `●` when extended thinking is enabled
-- Effort level: `h`/`x`/`M` suffix for high/xhigh/max
+- Thinking indicator: `◉` for adaptive thinking, `●` for legacy enabled
+- Effort level: `l`/`m`/`h`/`x`/`◆`/`M` for low/medium/high/xhigh/ultracode/max
+- Fast mode indicator: `⚡` when fast mode is active
+- Remote session indicator: `🌐` when connected remotely
 - Agent indicator: `@name` prefix when agent is active (first 8 chars)
+- **Mark priority order**: thinking type → effort level → fast mode → remote session → agent name
 - **Family-preserving truncation**: extracts family keyword + version chain, skips "claude" prefix and date stamps
   - `claude-opus-4-7` → mid: `opus-4-7`, short: `opus`
   - `claude-3-5-sonnet-20241022` → mid: `3-5-sonnet`, short: `sonnet`
@@ -55,20 +58,23 @@ Rationale: `total_input_tokens`/`total_output_tokens` are cumulative across the 
 - Git branch: schema fields first (`wt_branch`, `git_worktree`, `worktree_name`), then `git` command with 5s cache
 - Branch gets `│` prefix when path is empty (visual distinction from context zone)
 - Vim mode indicator: `[N]` NORMAL, `[I]` INSERT, `[V]` VISUAL, `[V-L]` VISUAL LINE
+- PR number: `#123` when reviewing a pull request
+- Display order: branch → vim → PR number
 
 ### Zone 4 — Duration
 
 - Compound format: `1h24m`, `2d3h`, `45s` (sub-second suppressed)
-- Session tokens: cumulative input + output across entire session (secondary stat)
+- Lines changed: `+123` (green) / `-45` (red) when non-zero, shown alongside duration
 - Rate limits: `5h:42% 7d:15%` with color thresholds:
   - Green: ≤59%
   - Yellow: 60-84%
   - Red: ≥85%
 - Rate limits gracefully omitted for third-party providers (no `rate_limits` field)
+- Content order: duration → lines → rate limits
 
 ## Responsive Levels
 
-15 levels (L0-L7 + L2a/L2b/L3a + L8-L12) + fallback + emergency + last-resort:
+15 levels (L0-L7 + L2a/L2b/L3a + L8-L10) + fallback + emergency + last-resort:
 
 ### Core truncation (L0-L7)
 
@@ -90,17 +96,15 @@ Progressive truncation of model name, path, branch, and context detail:
 
 L2a/L2b/L3a were added to close a 64-char coverage gap between L2 and L3 that wasted space at 80-100 column terminals.
 
-### Optional element removal (L8-L12)
+### Optional element removal (L8-L10)
 
 Drop optional elements by priority (least critical first):
 
-| Level | Rate | Vim | Session | Duration | Path |
-|-------|------|-----|---------|----------|------|
-| L8 | removed | kept | kept | kept | kept |
-| L9 | removed | removed | kept | kept | kept |
-| L10 | removed | removed | removed | kept | kept |
-| L11 | removed | removed | removed | removed | kept |
-| L12 | removed | removed | removed | removed | removed |
+| Level | Rate | Vim | Duration | Path |
+|-------|------|-----|----------|------|
+| L8 | removed | kept | kept | kept |
+| L9 | removed | removed | kept | kept |
+| L10 | removed | removed | removed | kept |
 
 ### Emergency levels
 
@@ -110,12 +114,11 @@ Drop optional elements by priority (least critical first):
 
 ## try_build / try_len Functions
 
-The `try_build(m, p, b, c, show_rate, show_vim, show_dur, show_session)` function assembles a candidate string with optional element flags:
+The `try_build(m, p, b, c, show_rate, show_vim, show_dur)` function assembles a candidate string with optional element flags:
 
 - `show_rate=1`: include rate limits zone
 - `show_vim=1`: include vim mode indicator
-- `show_dur=1`: include duration
-- `show_session=1`: include session tokens
+- `show_dur=1`: include duration and lines changed
 
 `try_len` computes the visible length using pre-computed zone lengths (pure arithmetic, zero forks). Each responsive level calls `try_len` first, then checks `_TL <= term_cols`. First fit wins, calls `try_build`, exits immediately.
 
@@ -125,7 +128,17 @@ All zone variant lengths are pre-computed before the responsive loop. The loop i
 
 ### Zone 4 pre-computation
 
-All 8 combinations of `(show_dur, show_session, show_rate)` flags are pre-computed as `_z4_*` variants with their visible lengths stored as `lz4_*`. The `try_len` function selects the correct variant using a flag-matching cascade.
+5 combinations of `(show_dur, show_rate)` flags are pre-computed as `_z4_*` variants with their visible lengths stored as `lz4_*`:
+
+| Variant | Flags | Content |
+|---------|-------|---------|
+| `_z4_full` | all | duration + lines + rates |
+| `_z4_dur_only` | sd=1, sr=0 | duration + lines |
+| `_z4_dur_rate` | sd=1, sr=1 | duration + lines + rates |
+| `_z4_rate_only` | sd=0, sr=1 | rates only |
+| `_z4_lines_only` | sd=0, sr=0 | lines only |
+
+Both `try_len` and `try_build` select from the same pre-computed variants using the same flag-matching cascade, ensuring consistent output.
 
 ## Visible Length Calculation
 
@@ -139,7 +152,7 @@ Where:
 - `chars` = `${#s}` (bash string length = character count)
 - `bytes` = `${#s}` under `LC_ALL=C` (byte count)
 - `N_4byte` = count of UTF-8 leading bytes F0-F4 (emoji and rare CJK), each occupies 2 display columns but 4 bytes
-- `N_3byte_single_width` = count of known 3-byte 1-column chars (`│▓░●…`)
+- `N_3byte_single_width` = count of known 3-byte 1-column chars (`│▓░●◉◆⚠…`)
 
 The base formula `chars + (bytes - chars - N_4byte) / 2` treats all 3-byte chars as 2-column CJK. Subtracting `N_3byte_single_width` corrects the overcount for box-drawing, block-element, and punctuation chars that are actually 1-column.
 
@@ -161,11 +174,19 @@ The script reads JSON from stdin. Key fields:
   },
   "workspace": { "current_dir": "...", "project_dir": "..." },
   "worktree": { "branch": "..." },
-  "cost": { "total_duration_ms": 5040000 },
+  "cost": {
+    "total_duration_ms": 5040000,
+    "total_lines_added": 123,
+    "total_lines_removed": 45
+  },
   "effort": { "level": "high" },
-  "thinking": { "enabled": true },
+  "thinking": { "enabled": true, "type": "adaptive" },
+  "fast_mode": false,
+  "exceeds_200k_tokens": false,
   "rate_limits": { "five_hour": { "used_percentage": 42 }, ... },
-  "vim": { "mode": "NORMAL" }
+  "vim": { "mode": "NORMAL" },
+  "remote": { "session_id": "abc123" },
+  "pr": { "number": 123, "url": "..." }
 }
 ```
 

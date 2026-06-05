@@ -65,15 +65,22 @@ fi
 
 | Mark | Meaning | Variable |
 |------|---------|----------|
-| `●` | Thinking enabled | `think_mark` |
-| `@name` | Agent active (first 8 chars) | `agent_mark` |
-| `h` | Effort: high | `effort_mark` |
+| `◉` | Adaptive thinking | `think_mark` |
+| `●` | Legacy thinking enabled | `think_mark` |
+| `◆` | Ultracode (xhigh + workflow) | `effort_mark` |
 | `x` | Effort: xhigh | `effort_mark` |
+| `h` | Effort: high | `effort_mark` |
 | `M` | Effort: max | `effort_mark` |
+| `⚡` | Fast mode active | `fast_mark` |
+| `🌐` | Remote session active | `remote_mark` |
+| `@name` | Agent active (first 8 chars) | `agent_mark` |
+| `#N` | PR number | `pr_mark` |
 | `[N]` | Vim: NORMAL | `vim_mark` |
 | `[I]` | Vim: INSERT | `vim_mark` |
 | `[V]` | Vim: VISUAL | `vim_mark` |
 | `[V-L]` | Vim: VISUAL LINE | `vim_mark` |
+| `+N` | Lines added | `lines_str` |
+| `-N` | Lines removed | `lines_str` |
 | `│` | Zone separator | `sep` |
 | `▓` | Bar filled cell | — |
 | `░` | Bar empty cell | — |
@@ -90,19 +97,17 @@ To adjust which elements appear at which width:
 2. Modify the `try_build`/`try_len` call parameters:
    - `show_rate=1/0` — show/hide rate limits
    - `show_vim=1/0` — show/hide vim mode
-   - `show_dur=1/0` — show/hide duration
-   - `show_session=1/0` — show/hide session tokens
+   - `show_dur=1/0` — show/hide duration and lines changed
 3. Reorder levels by moving `try_build`/`try_len` call pairs
 
 ### Adding a New Element
 
 1. Compute the element's string in the data extraction section
-2. Add a `show_xxx` flag parameter to `try_build` and `try_len`
-3. Add the element to the `try_build` assembly logic
+2. Add the element to the `try_build` assembly logic
+3. Pre-compute the element's visible length and any new Zone 4 variants
 4. Add length computation to `try_len`
-5. Pre-compute all Zone 4 flag combinations
-6. Create responsive levels that include/exclude the element
-7. Test across all terminal widths (4-200 columns)
+5. Create responsive levels that include/exclude the element
+6. Test across all terminal widths (4-200 columns)
 
 ## Git Branch Cache
 
@@ -149,7 +154,7 @@ To force showing the full path instead:
 
 Compound format by default: `1h24m`, `2d3h`, `45s`.
 
-Session tokens are displayed as a secondary stat in Zone 4 alongside duration, formatted with `fmt_tok` (e.g., `80.0k`).
+Lines changed are displayed as `+N` (green) / `-N` (red) alongside duration, formatted as raw integers (not k/M suffixes).
 
 ## Context TIER System
 
