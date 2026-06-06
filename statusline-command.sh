@@ -435,7 +435,7 @@ elif [ -n "$git_worktree" ]; then
 elif [ -n "$worktree_name" ]; then
   branch="$worktree_name"
 else
-  cache_file="/tmp/.claude-git-branch-$(printf '%s' "$cwd" | md5)"
+  cache_file="/tmp/.claude-git-branch-$(printf '%s' "$cwd" | (md5sum 2>/dev/null || md5) | cut -c1-32)"
   cache_age=0
   if [ -f "$cache_file" ]; then
     now=$(date +%s)

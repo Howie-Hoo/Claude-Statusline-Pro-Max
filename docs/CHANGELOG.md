@@ -2,6 +2,14 @@
 
 All notable changes to Claude-Statusline-Pro-Max are documented here.
 
+## v1.3.1 — 2026-06-06
+
+Linux compatibility fix for git branch cache.
+
+### Bug Fixes
+
+- **`md5` command not available on Linux**: Git branch cache file name used macOS-only `md5` command; now tries `md5sum` first with fallback to `md5`, using `cut -c1-32` for consistent 32-char hash output on both platforms.
+
 ## v1.3.0 — 2026-06-05
 
 Claude Code v2.1.163 compatibility: thinking modes, new indicators, ultracode support, and expanded metrics.

@@ -65,6 +65,24 @@ The script tries `stat -f %m` first, falls back to `stat -c %Y`:
 mtime=$(stat -f %m "$cache_file" 2>/dev/null || stat -c %Y "$cache_file" 2>/dev/null || echo 0)
 ```
 
+### `md5` / `md5sum` Hash
+
+Cross-platform support with fallback:
+
+```bash
+# macOS
+echo "path" | md5           # → d41d8cd98f00b204e9800998ecf8427e
+
+# Linux
+echo "path" | md5sum        # → d41d8cd98f00b204e9800998ecf8427e  -
+```
+
+The script tries `md5sum` first, falls back to `md5`, and extracts the first 32 chars:
+
+```bash
+printf '%s' "$cwd" | (md5sum 2>/dev/null || md5) | cut -c1-32
+```
+
 ## Third-Party Provider Support
 
 When using Claude Code with a third-party provider (e.g., via `ANTHROPIC_BASE_URL`):

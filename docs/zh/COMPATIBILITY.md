@@ -65,6 +65,24 @@ stat -c %Y file
 mtime=$(stat -f %m "$cache_file" 2>/dev/null || stat -c %Y "$cache_file" 2>/dev/null || echo 0)
 ```
 
+### `md5` / `md5sum` 哈希
+
+跨平台支持带回退：
+
+```bash
+# macOS
+echo "path" | md5           # → d41d8cd98f00b204e9800998ecf8427e
+
+# Linux
+echo "path" | md5sum        # → d41d8cd98f00b204e9800998ecf8427e  -
+```
+
+脚本先尝试 `md5sum`，回退到 `md5`，提取前 32 字符：
+
+```bash
+printf '%s' "$cwd" | (md5sum 2>/dev/null || md5) | cut -c1-32
+```
+
 ## 第三方 Provider 支持
 
 使用 Claude Code 连接第三方 Provider 时（如通过 `ANTHROPIC_BASE_URL`）：
