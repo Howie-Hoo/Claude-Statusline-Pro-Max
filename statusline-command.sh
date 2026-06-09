@@ -50,7 +50,6 @@ else
   # Sanitize newlines — single-line statusbar invariant
   model_name="${model_name//$'\n'/ }"
   agent_name="${agent_name//$'\n'/ }"
-  branch="${branch//$'\n'/ }"
   cwd="${cwd//$'\n'/ }"
 fi
 
@@ -269,37 +268,27 @@ elif [ "$ctx_size" -gt 0 ] 2>/dev/null; then
   ctx_tier=3
 fi
 
-# Context warning: when auto-compaction is disabled (exceeds_200k_tokens=true)
-# and usage exceeds 85%, force the display color to red regardless of the
-# normal threshold. This makes the bar and percentage turn red when the
-# user is genuinely at risk of hitting the context limit without a safety net.
-ctx_force_red="false"
-if [ "$exceeds_200k" = "true" ] && [ "$ctx_tier" -ge 1 ] 2>/dev/null; then
-  pct_int=${used_pct%.*}
-  [ "$pct_int" -gt 85 ] 2>/dev/null && ctx_force_red="true"
-fi
-
-if [ "$ctx_tier" -eq 1 ]; then
-  # ── TIER 1: Full fidelity display ──
+# Shared pct_int clamping, color selection, and progress bar for TIER 1 and TIER 2
+if [ "$ctx_tier" -ge 1 ]; then
   pct_int=${used_pct%.*}
   [ -z "$pct_int" ] && pct_int=0
   [ "$pct_int" -lt 0 ] && pct_int=0
   [ "$pct_int" -gt 100 ] && pct_int=100
-
   if [ "$pct_int" -gt 85 ]; then ctx_color=$RED
   elif [ "$pct_int" -gt 69 ]; then ctx_color=$YLW
   else ctx_color=$GRN
   fi
-  [ "$ctx_force_red" = "true" ] && ctx_color=$RED
-
-  fmt_tok "$used_tok"; used_f=$_FT
-  fmt_tok "$ctx_size"; total_f=$_FT
-
   filled=$(( pct_int / 10 ))
   empty=$(( 10 - filled ))
   bar=""
   i=0; while [ "$i" -lt "$filled" ]; do bar="${bar}▓"; i=$((i + 1)); done
   i=0; while [ "$i" -lt "$empty" ]; do bar="${bar}░"; i=$((i + 1)); done
+fi
+
+if [ "$ctx_tier" -eq 1 ]; then
+  # ── TIER 1: Full fidelity display ──
+  fmt_tok "$used_tok"; used_f=$_FT
+  fmt_tok "$ctx_size"; total_f=$_FT
 
   ctx_full="${ctx_color}${bar}${RST} ${ctx_color}${used_pct}%${RST} ${DIM}${used_f}/${total_f}${RST}"
   ctx_mid="${ctx_color}${used_pct}%${RST} ${DIM}${used_f}/${total_f}${RST}"
@@ -307,24 +296,7 @@ if [ "$ctx_tier" -eq 1 ]; then
 
 elif [ "$ctx_tier" -eq 2 ]; then
   # ── TIER 2: Percentage + bar (derived from used_pct), no token counts ──
-  pct_int=${used_pct%.*}
-  [ -z "$pct_int" ] && pct_int=0
-  [ "$pct_int" -lt 0 ] && pct_int=0
-  [ "$pct_int" -gt 100 ] && pct_int=100
-
-  if [ "$pct_int" -gt 85 ]; then ctx_color=$RED
-  elif [ "$pct_int" -gt 69 ]; then ctx_color=$YLW
-  else ctx_color=$GRN
-  fi
-  [ "$ctx_force_red" = "true" ] && ctx_color=$RED
-
   fmt_tok "$ctx_size"; total_f=$_FT
-
-  filled=$(( pct_int / 10 ))
-  empty=$(( 10 - filled ))
-  bar=""
-  i=0; while [ "$i" -lt "$filled" ]; do bar="${bar}▓"; i=$((i + 1)); done
-  i=0; while [ "$i" -lt "$empty" ]; do bar="${bar}░"; i=$((i + 1)); done
 
   ctx_full="${ctx_color}${bar}${RST} ${ctx_color}${used_pct}%${RST} ${DIM}${total_f}${RST}"
   ctx_mid="${ctx_color}${used_pct}%${RST} ${DIM}${total_f}${RST}"
@@ -426,31 +398,48 @@ else
   [ ${#path_short} -gt 15 ] && path_short="${path_short:0:14}…"
 fi
 
-# Git branch: prefer schema fields, fallback to git command with cache
+# Git info: branch + version tag, merged cache
+# Schema fields take priority; cache file stores both values (2 lines)
 branch=""
+version_tag=""
 if [ -n "$wt_branch" ]; then
   branch="$wt_branch"
 elif [ -n "$git_worktree" ]; then
   branch="$git_worktree"
 elif [ -n "$worktree_name" ]; then
   branch="$worktree_name"
-else
-  cache_file="/tmp/.claude-git-branch-$(printf '%s' "$cwd" | (md5sum 2>/dev/null || md5) | cut -c1-32)"
-  cache_age=0
-  if [ -f "$cache_file" ]; then
-    now=$(date +%s)
-    mtime=$(stat -f %m "$cache_file" 2>/dev/null || stat -c %Y "$cache_file" 2>/dev/null || echo 0)
-    cache_age=$(( now - mtime ))
-  fi
-  if [ "$cache_age" -gt 5 ] || [ ! -f "$cache_file" ]; then
-    _tmp_cache="${cache_file}.tmp.$$"
-    git -C "$cwd" symbolic-ref --short HEAD 2>/dev/null > "$_tmp_cache" || \
-    git -C "$cwd" rev-parse --short HEAD 2>/dev/null > "$_tmp_cache" || \
-    echo "" > "$_tmp_cache"
-    mv "$_tmp_cache" "$cache_file" 2>/dev/null
-  fi
-  read -r branch < "$cache_file" 2>/dev/null || branch=""
 fi
+
+if [ -n "$cwd" ]; then
+  _cwd_hash=$(printf '%s' "$cwd" | (md5sum 2>/dev/null || md5) | cut -c1-32)
+  _git_cache="/tmp/.claude-git-${_cwd_hash}"
+  _git_cache_age=999
+  if [ -f "$_git_cache" ]; then
+    now=$(date +%s)
+    _mt=$(stat -c %Y "$_git_cache" 2>/dev/null || stat -f %m "$_git_cache" 2>/dev/null || echo 0)
+    case "$_mt" in ''|*[!0-9]*) _mt=0 ;; esac
+    _git_cache_age=$(( now - _mt ))
+  fi
+  if [ "$_git_cache_age" -gt 5 ] || [ ! -f "$_git_cache" ]; then
+    # Cache miss: run both git commands, write to cache
+    _tmp_gc="${_git_cache}.tmp.$$"
+    _gc_branch=$(git -C "$cwd" symbolic-ref --short HEAD 2>/dev/null || git -C "$cwd" rev-parse --short HEAD 2>/dev/null || echo "")
+    _gc_ver=$(git -C "$cwd" describe --tags --abbrev=0 2>/dev/null || echo "")
+    printf '%s\n%s\n' "$_gc_branch" "$_gc_ver" > "$_tmp_gc"
+    mv "$_tmp_gc" "$_git_cache" 2>/dev/null
+  else
+    # Cache hit: read from file with zero-fork bash builtins
+    _gc_branch="" _gc_ver=""
+    { read -r _gc_branch; read -r _gc_ver; } < "$_git_cache" 2>/dev/null
+  fi
+  # Schema fields override git-derived branch; version always from git
+  [ -z "$branch" ] && branch="$_gc_branch"
+  version_tag="$_gc_ver"
+fi
+
+# Sanitize newlines — single-line invariant defense for git-derived values
+version_tag="${version_tag//$'\n'/ }"
+branch="${branch//$'\n'/ }"
 
 branch_full="$branch"
 if [ -n "$branch" ] && [ ${#branch} -gt 12 ]; then
@@ -458,6 +447,9 @@ if [ -n "$branch" ] && [ ${#branch} -gt 12 ]; then
 else
   branch_short="$branch"
 fi
+
+version_mark=""
+[ -n "$version_tag" ] && version_mark=" ${DIM}${version_tag}${RST}"
 
 # PR number: show in workspace zone when reviewing a PR
 pr_mark=""
@@ -549,9 +541,12 @@ visible_len "${CYN}${path_full}${RST}"; lp_full=$_VL
 visible_len "${CYN}${path_mid}${RST}"; lp_mid=$_VL
 visible_len "${CYN}${path_short}${RST}"; lp_short=$_VL
 
-# Branch zone (with space prefix when path is present)
+# Branch zone
 visible_len "${YLW}${branch_full}${RST}"; lb_full=$_VL
 visible_len "${YLW}${branch_short}${RST}"; lb_short=$_VL
+
+# Version mark (independent length, appended after branch)
+visible_len "$version_mark"; lver=$_VL
 
 # Vim mark
 visible_len "$vim_mark"; lvim=$_VL
@@ -608,9 +603,9 @@ try_build() {
   fi
   if [ -n "$b" ]; then
     if [ -n "$p" ]; then
-      result="${result} ${YLW}${b}${RST}"
+      result="${result} ${YLW}${b}${RST}${version_mark}"
     else
-      result="${result}${sep}${YLW}${b}${RST}"
+      result="${result}${sep}${YLW}${b}${RST}${version_mark}"
     fi
   fi
   [ "$sv" = "1" ] && result="${result}${vim_mark}"
@@ -656,9 +651,9 @@ try_len() {
   fi
   if [ $lb -gt 0 ]; then
     if [ $lp -gt 0 ]; then
-      total=$(( total + 1 + lb ))  # space + branch
+      total=$(( total + 1 + lb + lver ))  # space + branch + version
     else
-      total=$(( total + sep_len + lb ))  # sep + branch (no path)
+      total=$(( total + sep_len + lb + lver ))  # sep + branch + version (no path)
     fi
   fi
   [ "$sv" = "1" ] && total=$(( total + lvim ))

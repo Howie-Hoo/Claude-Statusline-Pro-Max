@@ -2,6 +2,20 @@
 
 Claude-Statusline-Pro-Max 的所有重要变更均记录于此。
 
+## v1.4.0 — 2026-06-09
+
+Linux 兼容性修复和版本指示器。
+
+### 新功能
+
+- **Zone 3 版本指示器**：在分支名旁显示最新的 git 标签（发布版本），例如 `main v1.3.1`。通过 `git describe --tags --abbrev=0` 动态获取，5 秒缓存。仅当分支和 cwd 同时存在时显示 — 非 git 项目或无标签时不显示。
+
+### Bug 修复
+
+- **`stat` 命令顺序导致 Linux 分支名不显示**：`stat -f %m`（macOS 语法）排在 `stat -c %Y`（Linux 语法）前面。在 Linux 上，`stat -f %m` 执行成功但输出的是文件系统元数据而非 mtime — `||` 短路永远不会触发 Linux 回退。已修正为 `stat -c %Y` 优先，使 Linux 成为主路径。这是 Linux 上分支名不显示的根本原因。
+- **`mtime` 值未校验**：即使 `stat` 顺序正确，非数字输出仍会导致 bash 算术崩溃。增加 `case` glob 守卫（零 fork POSIX），确保 `mtime` 在算术运算前始终为有效整数。
+- **空 `cwd` 导致虚假分支名**：当 JSON 输入缺少 `workspace` 字段时，`cwd` 为空字符串。`git -C ""` 会在当前工作目录执行，返回无关仓库的分支名。增加 `[ -n "$cwd" ]` 守卫，仅当 cwd 非空时才执行 git 命令。
+
 ## v1.3.1 — 2026-06-06
 
 Git 分支缓存的 Linux 兼容性修复。

@@ -49,7 +49,7 @@ stdin (JSON) → jq parse → eval + sanitize → zone computation → responsiv
 Four zones separated by `│`:
 1. **Model** — family-preserving name truncation + thinking/effort/fast/remote/agent marks, color-coded by family (Opus=magenta, Sonnet=blue, Haiku=cyan)
 2. **Context** — TIER-based display with progress bar, color thresholds at 70%/85%. Red forced when `exceeds_200k_tokens=true` and usage > 85%.
-3. **Workspace** — project name + relative path + git branch + vim mode + PR number
+3. **Workspace** — project name + relative path + git branch + version tag + vim mode + PR number
 4. **Duration** — compound format (`1h24m`) + lines changed (`+123/-45`) + rate limits
 
 ### Context TIER System
@@ -79,7 +79,7 @@ Actual ESC bytes via `$'\033'[0m` syntax (not literal `\033` strings). All outpu
 
 ### Git Branch Cache
 
-5-second cache at `/tmp/.claude-git-branch-$(md5_of_cwd)` with atomic write. Schema fields (`wt_branch`, `git_worktree`, `worktree_name`) take priority over the git command. Cross-platform `stat` for mtime (macOS + Linux).
+5-second cache at `/tmp/.claude-git-$(md5_of_cwd)` with atomic write. Stores both branch (line 1) and version tag (line 2) in a single file. Schema fields (`wt_branch`, `git_worktree`, `worktree_name`) take priority for branch. Cross-platform `stat` for mtime (Linux `stat -c %Y` first, then macOS `stat -f %m`), with numeric validation via `case` glob (zero-fork POSIX). Empty `cwd` guard prevents spurious git commands. Version tag resolved via `git describe --tags --abbrev=0`. Shown as dim text after branch name (e.g. `main v1.4.0`).
 
 ### Rate Limit Thresholds
 

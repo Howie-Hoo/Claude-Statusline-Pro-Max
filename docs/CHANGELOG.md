@@ -2,6 +2,20 @@
 
 All notable changes to Claude-Statusline-Pro-Max are documented here.
 
+## v1.4.0 — 2026-06-09
+
+Linux compatibility fixes and version indicator.
+
+### Features
+
+- **Version indicator in Zone 3**: Shows the latest git tag (release version) next to the branch name (e.g. `main v1.3.1`). Dynamically resolved via `git describe --tags --abbrev=0` with 5-second cache. Only shown when both branch and cwd are present — disappears for non-git projects or when no tags exist.
+
+### Bug Fixes
+
+- **`stat` command order breaks Linux branch detection**: `stat -f %m` (macOS syntax) was tried before `stat -c %Y` (Linux syntax). On Linux, `stat -f %m` succeeds but outputs filesystem metadata instead of mtime — the `||` short-circuit never fell through to the Linux fallback. Reversed to `stat -c %Y` first, making Linux the primary path. This was the root cause of branch names not displaying on Linux.
+- **`mtime` value not validated**: Even with correct `stat` order, non-numeric output from unexpected `stat` behavior would crash bash arithmetic. Added `case` glob guard (zero-fork POSIX) to guarantee `mtime` is always a valid integer before arithmetic use.
+- **Empty `cwd` causes spurious branch name**: When JSON input lacked a `workspace` field, `cwd` was empty. `git -C ""` silently runs in the current working directory, returning a branch name from an unrelated repo. Added `[ -n "$cwd" ]` guard so git commands only execute when cwd is non-empty.
+
 ## v1.3.1 — 2026-06-06
 
 Linux compatibility fix for git branch cache.

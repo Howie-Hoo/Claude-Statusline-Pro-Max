@@ -56,10 +56,11 @@ Rationale: `total_input_tokens`/`total_output_tokens` are cumulative across the 
 - Project name + relative path when inside a project
 - `path_mid` truncation: project name capped at 20 chars (consistent with root case)
 - Git branch: schema fields first (`wt_branch`, `git_worktree`, `worktree_name`), then `git` command with 5s cache
+- Version indicator: latest git tag (`v1.3.1`) shown after branch, resolved via `git describe --tags --abbrev=0` with 5s cache
 - Branch gets `│` prefix when path is empty (visual distinction from context zone)
 - Vim mode indicator: `[N]` NORMAL, `[I]` INSERT, `[V]` VISUAL, `[V-L]` VISUAL LINE
 - PR number: `#123` when reviewing a pull request
-- Display order: branch → vim → PR number
+- Display order: branch → version → vim → PR number
 
 ### Zone 4 — Duration
 

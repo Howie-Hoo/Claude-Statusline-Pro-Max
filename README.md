@@ -34,7 +34,7 @@ cp statusline-command.sh ~/.claude/statusline-command.sh
 ## The 4 Zones
 
 ```
-Opus 4.8 ◉ ◆ ⚡ │ ▓▓▓▓▓▓░░░░ 67% 130.0k/200.0k │ my-app/src/components main #42 │ 1h24m +123 -45 5h:35% 7d:12%
+Opus 4.8 ◉ ◆ ⚡ │ ▓▓▓▓▓▓░░░░ 67% 130.0k/200.0k │ my-app/src/components main v1.3.1 #42 │ 1h24m +123 -45 5h:35% 7d:12%
 └───── Model ─────┘ └──────── Context ───────────┘ └────── Workspace ─────────┘ └────── Duration ───────┘
 ```
 
@@ -42,7 +42,7 @@ Opus 4.8 ◉ ◆ ⚡ │ ▓▓▓▓▓▓░░░░ 67% 130.0k/200.0k │ my
 |------|---------|-------------|
 | **Model** | Name + thinking/effort/fast/remote/agent marks | Opus=magenta, Sonnet=blue, Haiku=cyan |
 | **Context** | Progress bar + % + token counts | Green <70%, Yellow 70-85%, Red >85% |
-| **Workspace** | Project + relative path + git branch + vim + PR | — |
+| **Workspace** | Project + relative path + git branch + version + vim + PR | — |
 | **Duration** | Elapsed time + lines changed + rate limits | Rate: Green ≤59%, Yellow 60-84%, Red ≥85% |
 
 ## Context TIER System
@@ -81,6 +81,7 @@ At narrow terminals, content truncates progressively:
 | 🌐 | Remote session active | Zone 1 |
 | @name | Agent active (first 8 chars) | Zone 1 |
 | #N | PR number | Zone 3 |
+| *tag* | Latest git tag (any format) | Zone 3 |
 | [N] | Vim: NORMAL | Zone 3 |
 | [I] | Vim: INSERT | Zone 3 |
 | [V] | Vim: VISUAL | Zone 3 |

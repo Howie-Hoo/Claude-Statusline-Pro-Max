@@ -56,10 +56,11 @@ stdin (JSON) → jq 解析 → 区域计算 → 响应式组装 → stdout
 - 在项目内时显示项目名 + 相对路径
 - `path_mid` 截断：项目名上限 20 字符（与根目录情况一致）
 - Git 分支：优先用 schema 字段（`wt_branch`、`git_worktree`、`worktree_name`），回退到 `git` 命令 + 5 秒缓存
+- 版本指示器：分支名后显示最新 git 标签（如 `v1.3.1`），通过 `git describe --tags --abbrev=0` 获取，5 秒缓存
 - 路径为空时分支加 `│` 前缀（视觉区分）
 - Vim 模式指示器：`[N]` NORMAL，`[I]` INSERT，`[V]` VISUAL，`[V-L]` VISUAL LINE
 - PR 编号：审查 PR 时显示 `#123`
-- 显示顺序：分支 → vim → PR 编号
+- 显示顺序：分支 → 版本 → vim → PR 编号
 
 ### 区域 4 — 时长
 
